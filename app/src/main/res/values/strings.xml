@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Notes</string>
+    <string name="title_activity_post">PostActivity</string>
+    <string name="message">Want to delete note ?</string>
+    <string name="title">Delete note</string>
+    <string name="title_activity_main2">Main2Activity</string>
+</resources>

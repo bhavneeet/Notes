@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorWhite"
+    tools:context="othello.com.example.bhavneetsingh.notes.PostActivity">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="match_parent"
+        android:background="@color/colorWhite"
+        tools:context="othello.com.example.bhavneetsingh.notes.PostActivity">
+        <include layout="@layout/profile_layout"
+            android:id="@+id/profile_image" />
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/img_height">
+        <EditText
+            android:id="@+id/postText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/colorWhite"
+            android:fontFamily="casual"
+            android:gravity="start"
+            android:hint="What's on your mind?"
+            android:inputType="text|textCapSentences|textAutoComplete|textMultiLine|textLongMessage"
+            android:maxLength="100"
+            android:textColor="@android:color/black"
+            android:textStyle="bold" />
+       <ImageView
+           android:scaleType="centerCrop"
+           android:id="@+id/postImage"
+           android:layout_gravity="center"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           />
+        </LinearLayout>
+        <Spinner
+
+            android:id="@+id/options_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dialog" />
+</LinearLayout>
+</android.support.v4.widget.NestedScrollView>

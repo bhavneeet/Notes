@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorWhite"
+        android:id="@+id/like_layout"
+      >
+
+        <pl.droidsonroids.gif.GifImageView
+            android:layout_width="@dimen/like"
+            android:layout_height="@dimen/like"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:layout_gravity="center"
+            android:background="@color/colorWhite"
+            android:id="@+id/like_options_happy"
+            android:fontFamily="casual"
+            android:padding="2dp"
+            android:src="@drawable/laugh"
+            android:textColor="@color/colorPrimary"
+            android:textStyle="bold" />
+
+        <pl.droidsonroids.gif.GifImageView
+            android:layout_width="@dimen/like"
+            android:layout_height="@dimen/like"
+            android:layout_weight="1"
+            android:id="@+id/like_options_sad"
+            android:scaleType="fitCenter"
+            android:layout_gravity="center"
+            android:background="@color/colorWhite"
+            android:padding="2dp"
+            android:fontFamily="casual"
+            android:src="@drawable/sad"
+            android:textColor="@color/colorPrimary"
+            android:textStyle="bold" />
+
+        <pl.droidsonroids.gif.GifImageView
+            android:layout_width="@dimen/like"
+            android:layout_height="@dimen/like"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:layout_gravity="center"
+            android:background="@color/colorWhite"
+            android:id="@+id/like_options_angry"
+            android:fontFamily="casual"
+            android:src="@drawable/angry"
+            android:textColor="@color/colorPrimary"
+            android:padding="2dp"
+            android:textStyle="bold" />
+
+    <pl.droidsonroids.gif.GifImageView
+        android:layout_width="@dimen/like"
+        android:layout_height="@dimen/like"
+        android:layout_weight="1"
+        android:scaleType="fitCenter"
+        android:layout_gravity="center"
+        android:background="@color/colorWhite"
+        android:fontFamily="casual"
+        android:src="@drawable/happy"
+        android:id="@+id/like_options_thuglife"
+        android:textColor="@color/colorPrimary"
+        android:padding="2dp"
+        android:textStyle="bold" />
+
+    </LinearLayout>

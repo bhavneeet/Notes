@@ -1,0 +1,7 @@
+<resources>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="img_height">391dp</dimen>
+    <dimen name="like">40dp</dimen>
+    <dimen name="signin">20sp</dimen>
+    <dimen name="signheading">48sp</dimen>
+</resources>
