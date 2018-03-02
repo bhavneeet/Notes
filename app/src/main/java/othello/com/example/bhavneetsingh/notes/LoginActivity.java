@@ -13,7 +13,8 @@ import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
 
-    Button signin,register,signin1,register1;
+    Button signin,signin1,register1;
+    TextView register;
     MyDatabase mydb;
     private boolean sign;
     public final static String LOGIN="login",NULL="null";
@@ -32,7 +33,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_login);
         signin=(Button)findViewById(R.id.sign_in);
         signin.setOnClickListener(this);
-        register=(Button)findViewById(R.id.register);
+        register=(TextView) findViewById(R.id.register);
         register.setOnClickListener(this);
         sign=true;
         mydb=MyDatabase.getInstance(this);
@@ -52,7 +53,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             setContentView(R.layout.activity_login);
             signin=(Button)findViewById(R.id.sign_in);
             signin.setOnClickListener(this);
-            register=(Button)findViewById(R.id.register);
+            register=(TextView) findViewById(R.id.register);
             register.setOnClickListener(this);
 
         }
