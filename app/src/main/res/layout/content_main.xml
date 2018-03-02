@@ -8,9 +8,13 @@
     tools:context="othello.com.example.bhavneetsingh.notes.MainActivity"
     android:orientation="vertical"
     android:background="@color/colorWhite">
+
     <ListView
+        android:id="@+id/allPosts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/allPosts"
-        />
+        android:divider="@android:color/background_light"
+        android:dividerHeight="10dp"
+        android:padding="5dp"
+        android:scrollbars="none" />
 </LinearLayout>

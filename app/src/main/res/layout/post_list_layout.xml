@@ -3,8 +3,11 @@
     android:id="@+id/post_list_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp"
 
-    android:orientation="vertical">
+    android:background="@drawable/shadow"
+    >
 
     <RelativeLayout
         android:id="@+id/icon_layout"
@@ -16,6 +19,8 @@
         <include layout="@layout/profile_layout" />
 
         <Button
+
+            android:shadowColor="@color/colorPrimary"
             android:id="@+id/pop_up_button"
             android:layout_width="24dp"
             android:layout_height="40dp"
@@ -46,15 +51,18 @@
         android:layout_below="@+id/postListText" android:layout_width="match_parent"
         android:layout_height="40dp"
         android:id="@+id/linearLayout"
+        android:background="@drawable/like_border"
         android:layout_marginBottom="10dp">
         <pl.droidsonroids.gif.GifImageView
             android:id="@+id/like_button"
             android:layout_width="50dp"
+
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:fontFamily="casual"
             android:text="Like"
-            android:background="@color/colorWhite"
+            android:backgroundTint="@color/colorWhite"
+            android:background="@drawable/like_border"
             android:src="@drawable/smiley"
             android:scaleType="fitCenter"
             android:textStyle="bold"
@@ -66,7 +74,8 @@
             android:layout_width="24dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/colorWhite"
+            android:backgroundTint="@color/colorWhite"
+            android:background="@drawable/like_border"
             android:fontFamily="casual"
             android:gravity="center"
             android:scaleType="fitCenter"
@@ -86,7 +95,8 @@
             android:scaleType="fitCenter"
             android:src="@drawable/share"
             android:text="Share"
-            android:background="@color/colorWhite"
+            android:backgroundTint="@color/colorWhite"
+            android:background="@drawable/like_border"
             android:textStyle="bold" />
     </LinearLayout>
 
