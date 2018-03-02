@@ -17,19 +17,30 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     TextView register;
     MyDatabase mydb;
     private boolean sign;
-    public final static String LOGIN="login",NULL="null";
+    public final static String LOGIN="login",NULL="null",LOGOUT="logout";
     private  SharedPreferences sharedPreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
        sharedPreferences=getSharedPreferences(LOGIN,MODE_PRIVATE);
         String userid=sharedPreferences.getString(LOGIN,NULL);
+        Intent intent=getIntent();
+        boolean logout=false;
+        if(intent!=null)
+         logout=intent.getBooleanExtra(LOGOUT,false);
+        if(logout)
+        {
+            userid=NULL;
+            sharedPreferences.edit().remove(LOGIN);
+            sharedPreferences.edit().commit();
+        }
         if(!userid.equals(NULL))
         {
-            Intent intent=new Intent(this,MainActivity.class);
-            intent.putExtra(MyDatabase.User.USER_ID,userid);
-            startActivity(intent);
+            Intent intent1=new Intent(this,MainActivity.class);
+            intent1.putExtra(MyDatabase.User.USER_ID,userid);
+            startActivity(intent1);
         }
+
         setContentView(R.layout.activity_login);
         signin=(TextView) findViewById(R.id.sign_in);
         signin.setOnClickListener(this);

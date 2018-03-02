@@ -55,6 +55,8 @@ import java.util.HashMap;
 
 import pl.droidsonroids.gif.GifImageView;
 
+import static othello.com.example.bhavneetsingh.notes.LoginActivity.LOGIN;
+
 public class MainActivity extends AppCompatActivity implements PostListAdapter.OnClickIcon,PostListAdapter.OnClicks,View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static int id = 3;
@@ -66,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
     private android.app.AlertDialog.Builder builder;//for Profile Photo
     private MyDatabase db_helper;//My Databse
     private Bundle user_bundle;
+    private DrawerLayout drawer;
     private MyDatabase.User current_user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        this.drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -132,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
+            logOut();
 
         } else if (id == R.id.nav_share) {
 
@@ -143,9 +147,23 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+    //Logging out
+    public void logOut()
+    {
+        SharedPreferences sharedPreferences=getSharedPreferences(LoginActivity.LOGIN,MODE_PRIVATE);
+        sharedPreferences.edit().clear();
+        sharedPreferences.edit().commit();
+        drawer.closeDrawer(GravityCompat.START);
+        Intent intent=new Intent(this,LoginActivity.class);
+      intent.putExtra(LoginActivity.LOGOUT,true);
+      startActivity(intent);
+    }
+    //fetch only my notes
     public void fetchMyNotes()
     {
-
+      postList.clear();
+       postList.addAll(DBManager.fetchMyNotes(db_helper,current_user));
+       adapter.notifyDataSetChanged();
     }
     //Showing Popup for Following
     private void showFollowPopup()
