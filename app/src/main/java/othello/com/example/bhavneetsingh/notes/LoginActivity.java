@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
 
-    Button signin,signin1,register1;
+    TextView signin;
     TextView register;
     MyDatabase mydb;
     private boolean sign;
@@ -31,9 +31,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             startActivity(intent);
         }
         setContentView(R.layout.activity_login);
-        signin=(Button)findViewById(R.id.sign_in);
+        signin=(TextView) findViewById(R.id.sign_in);
         signin.setOnClickListener(this);
-        register=(TextView) findViewById(R.id.register);
+        register=(TextView) findViewById(R.id.register1);
         register.setOnClickListener(this);
         sign=true;
         mydb=MyDatabase.getInstance(this);
@@ -43,17 +43,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if(sign)
         {
             setContentView(R.layout.registrer_layout);
-            signin=(Button)findViewById(R.id.sign_in1);
+            signin=(TextView) findViewById(R.id.sign_in1);
             signin.setOnClickListener(this);
-            register=(Button)findViewById(R.id.register1);
+            register=(TextView) findViewById(R.id.register);
             register.setOnClickListener(this);
         }
         else
         {
             setContentView(R.layout.activity_login);
-            signin=(Button)findViewById(R.id.sign_in);
+            signin=(TextView) findViewById(R.id.sign_in);
             signin.setOnClickListener(this);
-            register=(TextView) findViewById(R.id.register);
+            register=(TextView) findViewById(R.id.register1);
             register.setOnClickListener(this);
 
         }
@@ -150,9 +150,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         try{
             //get username
-            EditText userid=(EditText)findViewById(R.id.username);
+            EditText userid=(EditText)findViewById(R.id.new_username);
             //get password
-            EditText password=(EditText)findViewById(R.id.user_password);
+            EditText password=(EditText)findViewById(R.id.new_user_password);
             //check for empty
             if(userid.getText().toString().length()==0)
             {
@@ -161,13 +161,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             //check password
             checkPassword(password.getText().toString());
             //confirm password
-            EditText confirm=(EditText)findViewById(R.id.user_confirm_password);
+            EditText confirm=(EditText)findViewById(R.id.confirm_user_password);
             if(!confirm.getText().toString().equals(password.getText().toString()))
             {
                 throw new PasswordException("Password must be same");
             }
             //get email id
-            EditText id=(EditText)findViewById(R.id.user_id);
+            EditText id=(EditText)findViewById(R.id.userid);
             //check email id
             checkID(id.getText().toString());
             bundle.putString(MyDatabase.User.NAME,userid.getText().toString());

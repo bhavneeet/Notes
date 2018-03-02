@@ -17,7 +17,17 @@
     <style name = "login_theme" parent = "Theme.AppCompat.Light.NoActionBar">
         <item name = "android:windowNoTitle">true</item>
     </style>
-
+    <style name="button" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColorHint">@color/colorPrimaryDark</item>
+        <item name="android:background">@drawable/edit_background</item>
+        <item name="android:width">@dimen/login_wid</item>
+        <item name="android:height">@dimen/login_hei</item>
+        <item name="android:layout">@style/layout</item>
+        <item name="android:textAlignment">center</item>
+       <item name="android:textColor" >@color/colorPrimaryDark</item>
+        <item name="android:textStyle">bold</item>
+    </style>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

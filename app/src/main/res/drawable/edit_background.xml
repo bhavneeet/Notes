@@ -10,4 +10,6 @@
         android:right="1dp"
         android:bottom="1dp" />
      <corners android:radius="20dp"/>
+    <size android:width="@dimen/login_wid" android:height="@dimen/login_hei">
+    </size>
 </shape>

@@ -6,4 +6,5 @@
     <dimen name="login_wid">350dp</dimen>
     <dimen name="login_hei">60dp</dimen>
     <dimen name="signheading">50sp</dimen>
+    <style name="layout">center</style>
 </resources>
