@@ -6,5 +6,11 @@
     <dimen name="login_wid">350dp</dimen>
     <dimen name="login_hei">60dp</dimen>
     <dimen name="signheading">50sp</dimen>
+
     <style name="layout">center</style>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="nav_header_vertical_spacing">8dp</dimen>
+    <dimen name="nav_header_height">250dp</dimen>
 </resources>

@@ -12,10 +12,17 @@ import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -48,7 +55,7 @@ import java.util.HashMap;
 
 import pl.droidsonroids.gif.GifImageView;
 
-public class MainActivity extends AppCompatActivity implements PostListAdapter.OnClickIcon,PostListAdapter.OnClicks,View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements PostListAdapter.OnClickIcon,PostListAdapter.OnClicks,View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static int id = 3;
     public static final int MAINACTIVITY = 1;
@@ -63,7 +70,19 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_home);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
         db_helper =  MyDatabase.getInstance(this);
         Intent intent=getIntent();
         //Getting user profile from login activity
@@ -72,9 +91,12 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
             user_bundle=intent.getExtras();
             current_user=DBManager.containsUser(db_helper,user_bundle.getString(MyDatabase.User.USER_ID));
         }
+        TextView header_name=(TextView)navigationView.getHeaderView(0).findViewById(R.id.navigation_header);
+        header_name.setText(current_user.getName());
+        TextView header_id=(TextView)navigationView.getHeaderView(0).findViewById(R.id.navigation_id);
+        header_id.setText(current_user.getUser_id());
         //For Welcoming
         Toast.makeText(this, "Welcome", Toast.LENGTH_SHORT).show();
-        showFollowPopup();
         editText = (EditText) findViewById(R.id.postText);
         adapter = new PostListAdapter(this, postList, this);
         adapter.setOnClicks(this);
@@ -85,6 +107,45 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         FloatingActionButton button=(FloatingActionButton)findViewById(R.id.fab);
         button.setOnClickListener(this);
         builder=new android.app.AlertDialog.Builder(this);
+    }
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+            fetchMyNotes();
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+    public void fetchMyNotes()
+    {
+
     }
     //Showing Popup for Following
     private void showFollowPopup()
@@ -292,7 +353,7 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         window.showAsDropDown(button, 40, -(offy));
         likeClicked = true;
     }
-   //
+   //Creating Post
    public void createPost()
    {
        Intent intent = new Intent(this, PostActivity.class);
@@ -357,4 +418,6 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         intent.putExtra(MyDatabase.Comment.POST_ID,postList.get(pos).getId());
         startActivity(intent);
     }
+
+
 }

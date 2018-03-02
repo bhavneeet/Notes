@@ -10,8 +10,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:theme="@style/AppTheme.NoActionBar"
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize">
+
 
         </activity>
         <activity
@@ -22,14 +24,21 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".LoginActivity"
-            android:theme="@style/login_theme"
-            android:configChanges="orientation|screenSize">
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/login_theme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
-        <activity android:name=".FriendsSuggestions"></activity>
+        <activity android:name=".FriendsSuggestions" />
+        <activity
+            android:name=".HomeActivity"
+            android:label="@string/title_activity_home"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
+
 </manifest>
