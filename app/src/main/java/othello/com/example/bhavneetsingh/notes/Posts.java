@@ -51,4 +51,5 @@ public class Posts {
     public void setUser(MyDatabase.User user) {
         this.user = user;
     }
+
 }

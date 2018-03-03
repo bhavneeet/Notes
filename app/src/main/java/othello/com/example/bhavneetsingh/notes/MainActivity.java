@@ -2,20 +2,26 @@ package othello.com.example.bhavneetsingh.notes;
 
 import android.app.Dialog;
 import android.app.LauncherActivity;
+import android.app.Notification;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.drm.DrmStore;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompatBase;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -111,6 +117,25 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         button.setOnClickListener(this);
         builder=new android.app.AlertDialog.Builder(this);
     }
+    public void onStart()
+    {
+        super.onStart();
+        BroadcastReceiver receiver=new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Toast.makeText(context, "Recieved", Toast.LENGTH_SHORT).show();
+            }
+                };
+        IntentFilter intentFilter=new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION);
+        intentFilter.addAction(Telephony.Sms.Intents.SMS_DELIVER_ACTION);
+        intentFilter.addAction(Intent.ACTION_BATTERY_LOW);
+        registerReceiver(receiver,intentFilter);
+
+    }
+    public void onStop()
+    {
+        super.onStop();
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -155,8 +180,9 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         sharedPreferences.edit().commit();
         drawer.closeDrawer(GravityCompat.START);
         Intent intent=new Intent(this,LoginActivity.class);
-      intent.putExtra(LoginActivity.LOGOUT,true);
-      startActivity(intent);
+        intent.putExtra(LoginActivity.LOGOUT,true);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
     //fetch only my notes
     public void fetchMyNotes()
@@ -322,12 +348,23 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
             ImageButton button = (ImageButton) (context.findViewById(id));
             onCommentClick(context,button,pos);
         }
-        else if (id == R.id.share_button) {
-           Toast.makeText(this,"Can't share now",Toast.LENGTH_LONG).show();
+        else if (id== R.id.share_button) {
+         sharePost(context,pos);
 
         }
     }
-
+    //Shsre current post
+    public void sharePost(View context,int pos)
+    {
+        Intent intent=new Intent();
+        MyDatabase.User user=postList.get(pos).getUser();
+        String text=user.getName()+"\n"
+                +postList.get(pos).getContent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT,text);
+        startActivity(Intent.createChooser(intent,text));
+    }
     public int dpToPx(int dp) {
         DisplayMetrics displayMetrics = this.getResources().getDisplayMetrics();
         return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));

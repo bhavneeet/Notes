@@ -98,12 +98,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                    }
                    else
                    {
-                       Intent intent=new Intent(this,MainActivity.class);
-                       intent.putExtras(bundle);
-                       SharedPreferences.Editor editor=sharedPreferences.edit();
-                       editor.putString(LOGIN,bundle.getString(MyDatabase.User.USER_ID));
-                       editor.commit();
-                       startActivity(intent);
+                   startMain(bundle);
                    }
                }
            }
@@ -128,14 +123,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if(check)
                 {
                     Toast.makeText(this, "Created", Toast.LENGTH_SHORT).show();
-
-                    Intent intent=new Intent(this,MainActivity.class);
-                    intent.putExtras(bundle);
-
-                    SharedPreferences.Editor editor=sharedPreferences.edit();
-                    editor.putString(LOGIN,bundle.getString(MyDatabase.User.USER_ID));
-                    editor.commit();
-                    startActivity(intent);
+                    startMain(bundle);
                 }
                 else
                 {
@@ -143,6 +131,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
         }
+    }
+    //start main activity
+    public void startMain(Bundle bundle)
+    {
+
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.putString(LOGIN,bundle.getString(MyDatabase.User.USER_ID));
+        editor.commit();
+        Intent intent=new Intent(this,MainActivity.class);
+        intent.putExtras(bundle);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK
+        );
+        startActivity(intent);
     }
     public Bundle bundle()
     {
