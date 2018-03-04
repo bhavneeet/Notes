@@ -62,6 +62,7 @@ import java.util.HashMap;
 import pl.droidsonroids.gif.GifImageView;
 
 import static othello.com.example.bhavneetsingh.notes.LoginActivity.LOGIN;
+import static othello.com.example.bhavneetsingh.notes.LoginActivity.NULL;
 
 public class MainActivity extends AppCompatActivity implements PostListAdapter.OnClickIcon,PostListAdapter.OnClicks,View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
@@ -95,10 +96,13 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         db_helper =  MyDatabase.getInstance(this);
         Intent intent=getIntent();
         //Getting user profile from login activity
-        if(intent!=null)
+        if(intent!=null&&intent.hasExtra(MyDatabase.User.USER_ID))
         {
             user_bundle=intent.getExtras();
             current_user=DBManager.containsUser(db_helper,user_bundle.getString(MyDatabase.User.USER_ID));
+        }
+        else {
+            login();
         }
         TextView header_name=(TextView)navigationView.getHeaderView(0).findViewById(R.id.navigation_header);
         header_name.setText(current_user.getName());
@@ -117,6 +121,13 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         button.setOnClickListener(this);
         builder=new android.app.AlertDialog.Builder(this);
     }
+    public void login()
+    {
+        SharedPreferences sharedPreferences;
+        sharedPreferences=getSharedPreferences(LoginActivity.LOGIN,MODE_PRIVATE);
+        String userid=sharedPreferences.getString(LoginActivity.LOGIN,LoginActivity.NULL);
+        current_user=DBManager.containsUser(db_helper,userid);
+    }
     public void onStart()
     {
         super.onStart();
@@ -129,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         IntentFilter intentFilter=new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION);
         intentFilter.addAction(Telephony.Sms.Intents.SMS_DELIVER_ACTION);
         intentFilter.addAction(Intent.ACTION_BATTERY_LOW);
-        registerReceiver(receiver,intentFilter);
 
     }
     public void onStop()
@@ -181,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         drawer.closeDrawer(GravityCompat.START);
         Intent intent=new Intent(this,LoginActivity.class);
         intent.putExtra(LoginActivity.LOGOUT,true);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
     //fetch only my notes

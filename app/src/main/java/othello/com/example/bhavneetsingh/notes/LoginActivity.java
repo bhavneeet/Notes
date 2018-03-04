@@ -34,13 +34,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             sharedPreferences.edit().remove(LOGIN);
             sharedPreferences.edit().commit();
         }
-        if(!userid.equals(NULL))
-        {
-            Intent intent1=new Intent(this,MainActivity.class);
-            intent1.putExtra(MyDatabase.User.USER_ID,userid);
-            startActivity(intent1);
-        }
-
         setContentView(R.layout.activity_login);
         signin=(TextView) findViewById(R.id.sign_in);
         signin.setOnClickListener(this);
@@ -48,6 +41,19 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         register.setOnClickListener(this);
         sign=true;
         mydb=MyDatabase.getInstance(this);
+    }
+    public void alreadyLogin()
+    {
+        sharedPreferences=getSharedPreferences(LOGIN,MODE_PRIVATE);
+        String userid=sharedPreferences.getString(LOGIN,NULL);
+        Intent intent=getIntent();
+        if(!userid.equals(NULL))
+        {
+            Intent intent1=new Intent(this,MainActivity.class);
+            intent1.putExtra(MyDatabase.User.USER_ID,userid);
+            startActivity(intent1);
+        }
+
     }
     public void changeLayout()
     {
