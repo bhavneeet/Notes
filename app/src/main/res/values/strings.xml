@@ -1,13 +1,14 @@
 <resources>
-    <string name="app_name">Notes</string>
+    <string name="app_name">Triads</string>
     <string name="title_activity_post">PostActivity</string>
     <string name="message">Want to delete note ?</string>
     <string name="title">Delete note</string>
     <string name="title_activity_main2">Main2Activity</string>
     <string name="title_activity_home">HomeActivity</string>
-
+    <string name="searchhint">Search Posts</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="title_activity_networking">Networking</string>
 </resources>

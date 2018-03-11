@@ -98,6 +98,31 @@ public class DBManager {
         }
         return postsArrayList;
     }
+    public static ArrayList<Posts> fetchSimilarNotes(SQLiteOpenHelper db_helper, String username)
+    {
+        ArrayList<Posts>postsArrayList=new ArrayList<>();
+        SQLiteDatabase db=db_helper.getReadableDatabase();
+        String query="SELECT * "
+                +"FROM "+MyDatabase.KEY_TABLE+" as T ,"+MyDatabase.User.TABLE+" as S"
+                +" WHERE (T."+ MyDatabase.User.USER_ID+" = "+"S."+MyDatabase.User.USER_ID+" and S."+MyDatabase.User.NAME+" like ?)"
+                +" ORDER BY "+MyDatabase.KEY_DATE+" DESC";
+
+        Cursor cursor=db.rawQuery(query,new String[]{username.substring(0,3)+'%'});
+        while(cursor.moveToNext())
+        {
+            String content=cursor.getString(cursor.getColumnIndex(MyDatabase.KEY_CONTEXT));
+            int smiley=cursor.getInt(cursor.getColumnIndex(MyDatabase.KEY_SMILEY));
+            long id=cursor.getInt(cursor.getColumnIndex(MyDatabase.KEY_ID));
+            String usern=cursor.getString(cursor.getColumnIndex(MyDatabase.User.NAME));
+            String userp=cursor.getString(cursor.getColumnIndex(MyDatabase.User.PASSWORD));
+            String useri=cursor.getString(cursor.getColumnIndex(MyDatabase.User.USER_ID));
+            Posts posts=new Posts(new MyDatabase.User(useri,usern,userp),content);
+            posts.setSmiley_id(smiley);
+            posts.setId(id);
+            postsArrayList.add(posts);
+        }
+        return postsArrayList;
+    }
     // fetch only user notes
     public static ArrayList<Posts> fetchMyNotes(SQLiteOpenHelper db_helper, MyDatabase.User user)
     {

@@ -22,18 +22,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        alreadyLogin();
        sharedPreferences=getSharedPreferences(LOGIN,MODE_PRIVATE);
         String userid=sharedPreferences.getString(LOGIN,NULL);
         Intent intent=getIntent();
         boolean logout=false;
         if(intent!=null)
          logout=intent.getBooleanExtra(LOGOUT,false);
-        if(logout)
-        {
-            userid=NULL;
-            sharedPreferences.edit().remove(LOGIN);
-            sharedPreferences.edit().commit();
-        }
+
         setContentView(R.layout.activity_login);
         signin=(TextView) findViewById(R.id.sign_in);
         signin.setOnClickListener(this);
@@ -51,6 +47,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         {
             Intent intent1=new Intent(this,MainActivity.class);
             intent1.putExtra(MyDatabase.User.USER_ID,userid);
+            intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent1);
         }
 
@@ -58,6 +55,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void changeLayout()
     {
         if(sign)
+
         {
             setContentView(R.layout.registrer_layout);
             signin=(TextView) findViewById(R.id.sign_in1);

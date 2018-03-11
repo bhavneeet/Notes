@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import java.util.ArrayList;
 
 import pl.droidsonroids.gif.GifImageView;
@@ -52,6 +54,7 @@ public class PostListAdapter extends BaseAdapter {
     }
 
 
+
     @Override
     public long getItemId(int position) {
         return posts.get(position).getId();
@@ -59,8 +62,10 @@ public class PostListAdapter extends BaseAdapter {
 
     public View getView(final int pos, View convertView, ViewGroup parent)
     {
+
         LayoutInflater inflater=context.getLayoutInflater();
         PostHolder holder=new PostHolder();
+
         Log.d("Positon",pos+""+posts.get(pos).getUser().getUser_id());
         if(convertView==null)
         {
@@ -70,32 +75,38 @@ public class PostListAdapter extends BaseAdapter {
            final PopupMenu menu=new PopupMenu(context,but);
            menu.getMenuInflater().inflate(R.menu.pop_up_menu,menu.getMenu());
            holder.menu=menu;
-           but.setOnClickListener(new View.OnClickListener() {
-               @Override
-               public void onClick(View v) {
-                 menu.show();
-               }
-           });
-           if(clicksListener!=null)
-           {
-               menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+           holder.button=but;
 
-                   @Override
-                   public boolean onMenuItemClick(MenuItem item) {
-                       clicksListener.onClickPopupMenu(item,pos);
-                       return true;
-                   }
-               });
-           }
+
            convertView.setTag(holder);
         }
         else
         {
             holder=(PostHolder)convertView.getTag();
+
         }
         holder.textView.setText(posts.get(pos).getContent());
         TextView textView=(TextView)convertView.findViewById(R.id.profile_name);
         textView.setText(posts.get(pos).getUser().getName());
+        final PopupMenu menu=holder.menu;
+
+        holder.button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menu.show();
+            }
+        });
+        if(clicksListener!=null)
+        {
+            menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    clicksListener.onClickPopupMenu(item,pos);
+                     return true;
+                }
+            });
+        }
         final ImageView icon=(ImageView)convertView.findViewById(R.id.profile_image);
         icon.setClickable(true);
         icon.setOnClickListener(new View.OnClickListener() {
@@ -146,4 +157,5 @@ class PostHolder{
     TextView textView;
     ImageView imageView;
     PopupMenu menu;
+    Button button;
 }

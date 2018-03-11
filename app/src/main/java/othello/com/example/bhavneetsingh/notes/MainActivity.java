@@ -3,7 +3,9 @@ package othello.com.example.bhavneetsingh.notes;
 import android.app.Dialog;
 import android.app.LauncherActivity;
 import android.app.Notification;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +18,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.drm.DrmStore;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.os.AsyncTask;
 import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -52,8 +55,10 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
@@ -70,17 +75,26 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
     public static final int MAINACTIVITY = 1;
     private final ArrayList<Posts> postList= new ArrayList<>();;
     private PostListAdapter adapter;
-    private ListView list;
+    private  ListView list;
     private EditText editText;
     private android.app.AlertDialog.Builder builder;//for Profile Photo
     private MyDatabase db_helper;//My Databse
     private Bundle user_bundle;
     private DrawerLayout drawer;
+    private ProgressBar bar;
     private MyDatabase.User current_user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        //Setting progressbar
+        // Get the intent, verify the action and get the query
+        Intent intent1 = getIntent();
+        if (Intent.ACTION_SEARCH.equals(intent1.getAction())) {
+            String query = intent1.getStringExtra(SearchManager.QUERY);
+            Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
+        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -104,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         else {
             login();
         }
+        //
         TextView header_name=(TextView)navigationView.getHeaderView(0).findViewById(R.id.navigation_header);
         header_name.setText(current_user.getName());
         TextView header_id=(TextView)navigationView.getHeaderView(0).findViewById(R.id.navigation_id);
@@ -113,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         editText = (EditText) findViewById(R.id.postText);
         adapter = new PostListAdapter(this, postList, this);
         adapter.setOnClicks(this);
+        bar=(ProgressBar)findViewById(R.id.progressBar);
         list = (ListView) findViewById(R.id.allPosts);
         list.setAdapter(adapter);
         list.setClickable(true);
@@ -155,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
             super.onBackPressed();
         }
     }
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -186,8 +201,9 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
     public void logOut()
     {
         SharedPreferences sharedPreferences=getSharedPreferences(LoginActivity.LOGIN,MODE_PRIVATE);
-        sharedPreferences.edit().clear();
-        sharedPreferences.edit().commit();
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.clear();
+        editor.commit();
         drawer.closeDrawer(GravityCompat.START);
         Intent intent=new Intent(this,LoginActivity.class);
         intent.putExtra(LoginActivity.LOGOUT,true);
@@ -199,6 +215,7 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
     {
       postList.clear();
        postList.addAll(DBManager.fetchMyNotes(db_helper,current_user));
+       adapter.notifyDataSetInvalidated();
        adapter.notifyDataSetChanged();
     }
     //Showing Popup for Following
@@ -221,9 +238,38 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.create_post_menu, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        android.support.v7.widget.SearchView searchView = (android.support.v7.widget.SearchView) menu.findItem(R.id.searchItem).getActionView();
+        // Assumes current activity is the searchable activity
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+        ;
+        searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if(query.length()<3)
+                    return false;
+                MyDatabase.User current=DBManager.containsUser(db_helper,query);
+                ArrayList<Posts>list=DBManager.fetchSimilarNotes(db_helper,query);
+                Toast.makeText(MainActivity.this, list.size()+"", Toast.LENGTH_SHORT).show();
+
+                if(list.size()>0)
+                {
+                   postList.clear();
+                   postList.addAll(list);
+                   adapter.notifyDataSetChanged();
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
         return true;
     }
-
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==R.id.refresh)
         {
@@ -233,17 +279,34 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         {
             showFollowPopup();
         }
+        else if(item.getItemId()==R.id.searchItem)
+        {
+        }
         return true;
     }
     //Refreshing
     private void refresh()
     {
-        postList.clear();
-        Log.d("size",""+postList.size());
-        ArrayList<Posts> list=DBManager.fetchList(db_helper,current_user);
-        for(Posts posts:list)
-            postList.add(posts);
-        adapter.notifyDataSetChanged();
+
+        list.setVisibility(View.GONE);
+        bar.setVisibility(View.VISIBLE);
+
+        String urlLink="https://triads.herokuapp.com/db";
+        Networking networking=new Networking(new OnDownloadComplete() {
+            @Override
+            public void onDownloadComplete(ArrayList<Posts> posts) {
+
+                if(posts!=null)
+                {
+                    postList.clear();
+                    postList.addAll(posts);
+                    adapter.notifyDataSetChanged();
+                }
+                bar.setVisibility(View.GONE);
+                list.setVisibility(View.VISIBLE);
+            }
+        });
+        networking.execute(urlLink);
     }
 /*
 * When Post is created then result from post activity is added to list in main activity*/
@@ -312,7 +375,7 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
     //When menuitem of posts is clicked
 
     public void onClickPopupMenu(MenuItem menuItem, int pos) {
-        Log.d("hellomam",postList.get(pos).getUser().getUser_id()+" "+postList.get(pos).getUser().getName());
+        Log.d("currentUser",postList.get(pos).getUser().getUser_id()+" "+current_user.getUser_id());
         if(!postList.get(pos).getUser().getUser_id().equals(current_user.getUser_id()))
         {
             Toast.makeText(this, "Not Your Property", Toast.LENGTH_SHORT).show();
@@ -330,13 +393,13 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         }
         else if(menuItem.getItemId()==R.id.deleteMenuItem)
         {
-//                if(postList.size()>0){
-//                    Posts posts=postList.get(pos);
-//                    Log.d("error",pos+"");
-//                    DBManager.delete(db_helper,posts.getId());
-//                    postList.remove(pos);
-//                    adapter.notifyDataSetChanged();
-           // }
+                if(postList.size()>0){
+                    Posts posts=postList.get(pos);
+                    Log.d("error",pos+"");
+                    DBManager.delete(db_helper,posts.getId());
+                    postList.remove(pos);
+                    adapter.notifyDataSetChanged();
+            }
         }
         else if(menuItem.getItemId()==R.id.reportMenuItem)
         {

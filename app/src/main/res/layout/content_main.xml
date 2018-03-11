@@ -7,6 +7,12 @@
     android:id="@+id/activity_main"
     tools:context="othello.com.example.bhavneetsingh.notes.MainActivity"
     android:orientation="vertical">
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:id="@+id/progressBar"/>
     <ListView
         android:id="@+id/allPosts"
         android:layout_width="match_parent"
