@@ -20,57 +20,58 @@ import java.util.Scanner;
 
 public class Networking extends AsyncTask<String,Void,ArrayList<Posts>>{
 
-    private OnDownloadComplete mlistener;
+    private InternetActivity internetActivity;
 
-    public Networking(OnDownloadComplete mlistener) {
-        this.mlistener = mlistener;
+    public Networking( InternetActivity internetActivity) {
+        this.internetActivity = internetActivity;
     }
 
     @Override
     protected ArrayList<Posts> doInBackground(String... strings) {
-        ArrayList<Posts>postsList=new ArrayList<>();
-        String urlLink=strings[0];
-        try{
-            URL url=new URL(urlLink);
-            HttpURLConnection httpURLConnection=(HttpURLConnection)url.openConnection();
-            httpURLConnection.setRequestMethod("GET");
-            httpURLConnection.connect();
-            InputStream inputStream=httpURLConnection.getInputStream();
-            Scanner scanner=new Scanner(inputStream);
-            StringBuilder stringBuilder=new StringBuilder();
-            while(scanner.hasNext())
-            {
-                stringBuilder.append(scanner.next());
+            ArrayList<Posts>postsList=new ArrayList<>();
+            String urlLink=strings[0];
+            try{
+                URL url=new URL(urlLink);
+                HttpURLConnection httpURLConnection=(HttpURLConnection)url.openConnection();
+                httpURLConnection.setRequestMethod("GET");
+                httpURLConnection.connect();
+                InputStream inputStream=httpURLConnection.getInputStream();
+                Scanner scanner=new Scanner(inputStream);
+                StringBuilder stringBuilder=new StringBuilder();
+                while(scanner.hasNext())
+                {
+                    stringBuilder.append(scanner.next());
+                }
+                String result=stringBuilder.toString();
+                JSONArray posts=new JSONArray(result);
+                for(int i=0;i<posts.length();i++)
+                {
+                    JSONObject item=posts.getJSONObject(i);
+                    String user_name=item.getString("name");
+                    String password=item.getString("password");
+                    String user_id=item.getString("user_id");
+                    String context=item.getString("context");
+                    long post_id=item.getLong("post_id");
+                    Posts post=new Posts(new MyDatabase.User(user_id,user_name,password),context);
+                    post.setId(post_id);
+                    postsList.add(post);
+                }
+                inputStream.close();
+                scanner.close();
             }
-            String result=stringBuilder.toString();
-            JSONArray posts=new JSONArray(result);
-            for(int i=0;i<posts.length();i++)
+            catch(Exception e)
             {
-                JSONObject item=posts.getJSONObject(i);
-                String user_name=item.getString("name");
-                String password=item.getString("password");
-                String user_id=item.getString("user_id");
-                String context=item.getString("context");
-                long post_id=item.getLong("post_id");
-                Posts post=new Posts(new MyDatabase.User(user_id,user_name,password),context);
-                post.setId(post_id);
-                postsList.add(post);
+                Log.d("error",e.getLocalizedMessage());
             }
-            inputStream.close();
-            scanner.close();
-        }
-        catch(Exception e)
-        {
-            Log.d("error",e.getLocalizedMessage());
-        }
-        return postsList;
+            return postsList;
     }
     protected void onPostExecute(ArrayList<Posts>posts)
     {
         super.onPostExecute(posts);
-        mlistener.onDownloadComplete(posts);
+        internetActivity.onPostExecute(posts);
     }
-}
-interface OnDownloadComplete{
-    void onDownloadComplete(ArrayList<Posts>posts);
+    protected  void onPreExecute(ArrayList<Posts>posts)
+    {
+        internetActivity.onPreExecute(posts);
+    }
 }

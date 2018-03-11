@@ -61,15 +61,23 @@ import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 import pl.droidsonroids.gif.GifImageView;
 
 import static othello.com.example.bhavneetsingh.notes.LoginActivity.LOGIN;
 import static othello.com.example.bhavneetsingh.notes.LoginActivity.NULL;
 
-public class MainActivity extends AppCompatActivity implements PostListAdapter.OnClickIcon,PostListAdapter.OnClicks,View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements InternetActivity, PostListAdapter.OnClickIcon,PostListAdapter.OnClicks,View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static int id = 3;
     public static final int MAINACTIVITY = 1;
@@ -292,20 +300,7 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         bar.setVisibility(View.VISIBLE);
 
         String urlLink="https://triads.herokuapp.com/db";
-        Networking networking=new Networking(new OnDownloadComplete() {
-            @Override
-            public void onDownloadComplete(ArrayList<Posts> posts) {
-
-                if(posts!=null)
-                {
-                    postList.clear();
-                    postList.addAll(posts);
-                    adapter.notifyDataSetChanged();
-                }
-                bar.setVisibility(View.GONE);
-                list.setVisibility(View.VISIBLE);
-            }
-        });
+        Networking networking=new Networking(this);
         networking.execute(urlLink);
     }
 /*
@@ -546,6 +541,26 @@ public class MainActivity extends AppCompatActivity implements PostListAdapter.O
         intent.putExtra(MyDatabase.Comment.POST_ID,postList.get(pos).getId());
         startActivity(intent);
     }
+    public ArrayList<Posts> doInBackground(String... strings) {
+        return null;
+    }
+    @Override
+    public void onPostExecute(ArrayList<Posts> posts) {
 
+        if(posts!=null)
+        {
+            postList.clear();
+            postList.addAll(posts);
+            adapter.notifyDataSetChanged();
+        }
+        bar.setVisibility(View.GONE);
+        list.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onPreExecute(ArrayList<Posts> posts) {
+
+    }
 
 }
+
