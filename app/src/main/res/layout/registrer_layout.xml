@@ -114,8 +114,10 @@
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/login_progress"
         android:layout_alignEnd="@+id/sign_in1"
+        android:layout_centerHorizontal="true"
+        android:fadingEdge="vertical"
         android:visibility="gone"
+        android:progressDrawable="@drawable/login_progress"
         android:layout_alignTop="@+id/register" />
 </RelativeLayout>

@@ -77,7 +77,7 @@ import pl.droidsonroids.gif.GifImageView;
 import static othello.com.example.bhavneetsingh.notes.LoginActivity.LOGIN;
 import static othello.com.example.bhavneetsingh.notes.LoginActivity.NULL;
 
-public class MainActivity extends AppCompatActivity implements InternetActivity, PostListAdapter.OnClickIcon,PostListAdapter.OnClicks,View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements  PostListAdapter.OnClickIcon,PostListAdapter.OnClicks,View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static int id = 3;
     public static final int MAINACTIVITY = 1;
@@ -295,13 +295,22 @@ public class MainActivity extends AppCompatActivity implements InternetActivity,
     //Refreshing
     private void refresh()
     {
-
-        list.setVisibility(View.GONE);
-        bar.setVisibility(View.VISIBLE);
-
-        String urlLink="https://triads.herokuapp.com/db";
-        Networking networking=new Networking(this);
-        networking.execute(urlLink);
+      final  ProgressBar bar=findViewById(R.id.progressBar);
+       list.setVisibility(View.GONE);
+       bar.setVisibility(View.VISIBLE);
+        DBManager.fetchList(current_user, new OnDownloadComplete<ArrayList<Posts>>() {
+            @Override
+            public void onDownloadComplete(ArrayList<Posts> result) {
+              if(result!=null)
+              {
+                  list.setVisibility(View.VISIBLE);
+                  bar.setVisibility(View.GONE);
+                  postList.clear();
+                  postList.addAll(result);
+                  adapter.notifyDataSetChanged();
+              }
+            }
+        });
     }
 /*
 * When Post is created then result from post activity is added to list in main activity*/
@@ -317,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements InternetActivity,
                     bundle.putInt(MyDatabase.KEY_SMILEY, smileyId);
                     Posts posts = null;
                     //Storing new Post in Databse
-                    posts = DBManager.add(db_helper, bundle,current_user);
+                    posts = DBManager.addPost(db_helper, bundle,current_user);
                     postList.add(0,posts);
                     adapter.notifyDataSetChanged();
                 }
@@ -368,7 +377,6 @@ public class MainActivity extends AppCompatActivity implements InternetActivity,
         }
     }
     //When menuitem of posts is clicked
-
     public void onClickPopupMenu(MenuItem menuItem, int pos) {
         Log.d("currentUser",postList.get(pos).getUser().getUser_id()+" "+current_user.getUser_id());
         if(!postList.get(pos).getUser().getUser_id().equals(current_user.getUser_id()))
@@ -477,13 +485,7 @@ public class MainActivity extends AppCompatActivity implements InternetActivity,
         likeClicked = true;
     }
    //Creating Post
-   public void createPost()
-   {
-       Intent intent = new Intent(this, PostActivity.class);
-       intent.putExtra(MyDatabase.User.NAME,current_user.getName());
-       startActivityForResult(intent, PostActivity.POSTACTIVITY);
 
-   }
     public void onClick(View view) {
         if(view.getId()==R.id.fab)
         {
@@ -541,26 +543,11 @@ public class MainActivity extends AppCompatActivity implements InternetActivity,
         intent.putExtra(MyDatabase.Comment.POST_ID,postList.get(pos).getId());
         startActivity(intent);
     }
-    public ArrayList<Posts> doInBackground(String... strings) {
-        return null;
-    }
-    @Override
-    public void onPostExecute(ArrayList<Posts> posts) {
-
-        if(posts!=null)
-        {
-            postList.clear();
-            postList.addAll(posts);
-            adapter.notifyDataSetChanged();
-        }
-        bar.setVisibility(View.GONE);
-        list.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onPreExecute(ArrayList<Posts> posts) {
-
+    public void createPost()
+    {
+        Intent intent = new Intent(this, PostActivity.class);
+        intent.putExtra(MyDatabase.User.NAME,current_user.getName());
+        startActivityForResult(intent, PostActivity.POSTACTIVITY);
     }
 
 }
-

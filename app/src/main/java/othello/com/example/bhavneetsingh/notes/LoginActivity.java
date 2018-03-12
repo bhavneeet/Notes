@@ -304,7 +304,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
           Toast.makeText(this, "Authentication Failed!", Toast.LENGTH_SHORT).show();
           return;
       }
-      DBManager.addUser(mydb,new MyDatabase.User(result.getString(MyDatabase.User.USER_ID), MyDatabase.User.NAME, MyDatabase.User.PASSWORD));
+      DBManager.addUser(mydb,new MyDatabase.User(result.getString(MyDatabase.User.USER_ID),result.getString(MyDatabase.User.NAME) , result.getString(MyDatabase.User.PASSWORD)));
       startMain(result);
     }
 }

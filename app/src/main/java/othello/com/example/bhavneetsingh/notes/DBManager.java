@@ -6,8 +6,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.util.Log;
+import android.webkit.DownloadListener;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.w3c.dom.Comment;
 
 import java.text.SimpleDateFormat;
@@ -21,7 +25,6 @@ public class DBManager {
     {
         SQLiteDatabase db=db_helper.getReadableDatabase();
         ContentValues contentValues=new ContentValues();
-
         String args[]={source,target};
         Cursor cursor=db.query(MyDatabase.Graph.TABLE,null,MyDatabase.Graph.SOURCE+" = ? and "+MyDatabase.Graph.TARGET+" = ?",args,null,null,null,null);
         return cursor.moveToNext();
@@ -66,37 +69,31 @@ public class DBManager {
         }
         return usersArrayList;
     }
-    //Fetch Post List
-    public static ArrayList<Posts> fetchList(SQLiteOpenHelper db_helper, MyDatabase.User user)
-    {
-        ArrayList<Posts>postsArrayList=new ArrayList<>();
-        SQLiteDatabase db=db_helper.getReadableDatabase();
-        String query="SELECT * "
-                +"FROM "+MyDatabase.KEY_TABLE+" as T ,"+MyDatabase.User.TABLE+" as S"
-                +" WHERE (T."+ MyDatabase.User.USER_ID+" = "+"S."+MyDatabase.User.USER_ID+" and T."+MyDatabase.User.USER_ID+" = ?)"
-                +" OR "+
-                " S." + MyDatabase.User.USER_ID+" IN " +
-                "( SELECT "+MyDatabase.Graph.TARGET
-                +" FROM "+MyDatabase.Graph.TABLE
-                +" WHERE "+MyDatabase.Graph.SOURCE+" = ? "+" and T."+
-                MyDatabase.User.USER_ID+" = "+ MyDatabase.Graph.TARGET+")"
-                +" ORDER BY "+MyDatabase.KEY_DATE+" DESC";
 
-        Cursor cursor=db.rawQuery(query,new String[]{user.getUser_id(),user.getUser_id()});
-        while(cursor.moveToNext())
-        {
-            String content=cursor.getString(cursor.getColumnIndex(MyDatabase.KEY_CONTEXT));
-            int smiley=cursor.getInt(cursor.getColumnIndex(MyDatabase.KEY_SMILEY));
-            long id=cursor.getInt(cursor.getColumnIndex(MyDatabase.KEY_ID));
-            String usern=cursor.getString(cursor.getColumnIndex(MyDatabase.User.NAME));
-            String userp=cursor.getString(cursor.getColumnIndex(MyDatabase.User.PASSWORD));
-            String useri=cursor.getString(cursor.getColumnIndex(MyDatabase.User.USER_ID));
-            Posts posts=new Posts(new MyDatabase.User(useri,usern,userp),content);
-            posts.setSmiley_id(smiley);
-            posts.setId(id);
-            postsArrayList.add(posts);
-        }
-        return postsArrayList;
+    //Fetch Post List
+    public static ArrayList<Posts> fetchList(MyDatabase.User user,OnDownloadComplete downloadComplete)
+    {
+         final ArrayList<Posts>posts=new ArrayList<>();
+        Networking<ArrayList<Posts>> networking=new Networking<>(new InternetActivity<ArrayList<Posts>>() {
+
+            @Override
+            public ArrayList<Posts> doInBackground(String... strings) {
+                String url=strings[0];
+                String result=Networking.connectionResult(url);
+             return getPosts(result);
+            }
+            @Override
+
+            public void onPostExecute(ArrayList<Posts> result) {
+            }
+            @Override
+            public void onPreExecute(ArrayList<Posts> result) {
+
+            }
+        },downloadComplete);
+        String url="https://triads.herokuapp.com/userPosts?id="+user.getUser_id();
+        networking.execute(url);
+        return posts;
     }
     public static ArrayList<Posts> fetchSimilarNotes(SQLiteOpenHelper db_helper, String username)
     {
@@ -151,7 +148,7 @@ public class DBManager {
 
     }
     //Add Post
-    public static Posts add(SQLiteOpenHelper db_helper, Bundle bundle,MyDatabase.User current_user)
+    public static Posts addPost(SQLiteOpenHelper db_helper, Bundle bundle,MyDatabase.User current_user)
     {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date date = new Date();
@@ -249,5 +246,30 @@ public class DBManager {
         contentValues.put(MyDatabase.User.PASSWORD,user.getPassword());
         long id=db.insert(MyDatabase.User.TABLE,null,contentValues);
         return !(id==-1);
+    }
+    //Getting Posts
+    public static ArrayList<Posts> getPosts(String result)
+    {
+        ArrayList<Posts> postsList =new ArrayList<>();
+        try{
+            JSONArray posts=new JSONArray(result);
+            for(int i=0;i<posts.length();i++)
+            {
+                JSONObject item=posts.getJSONObject(i);
+                String user_name=item.getString("name");
+                String password=item.getString("password");
+                String user_id=item.getString("user_id");
+                String context=item.getString("context");
+                long post_id=item.getLong("post_id");
+                Posts post=new Posts(new MyDatabase.User(user_id,user_name,password),context);
+                post.setId(post_id);
+                postsList.add(post);
+            }
+        }
+        catch(Exception e)
+        {
+            Log.d("error",e.getLocalizedMessage());
+        }
+        return  postsList;
     }
 }

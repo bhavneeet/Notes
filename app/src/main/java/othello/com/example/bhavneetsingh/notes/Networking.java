@@ -1,77 +1,59 @@
 package othello.com.example.bhavneetsingh.notes;
 
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Networking extends AsyncTask<String,Void,ArrayList<Posts>>{
+public class Networking<T> extends AsyncTask<String,Void,T> {
 
-    private InternetActivity internetActivity;
-
-    public Networking( InternetActivity internetActivity) {
+    private InternetActivity<T> internetActivity;
+    private OnDownloadComplete<T> downloadComplete;
+    public Networking(InternetActivity<T> internetActivity,OnDownloadComplete<T>downloadComplete) {
         this.internetActivity = internetActivity;
+        this.downloadComplete=downloadComplete;
     }
 
     @Override
-    protected ArrayList<Posts> doInBackground(String... strings) {
-            ArrayList<Posts>postsList=new ArrayList<>();
-            String urlLink=strings[0];
-            try{
-                URL url=new URL(urlLink);
-                HttpURLConnection httpURLConnection=(HttpURLConnection)url.openConnection();
-                httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.connect();
-                InputStream inputStream=httpURLConnection.getInputStream();
-                Scanner scanner=new Scanner(inputStream);
-                StringBuilder stringBuilder=new StringBuilder();
-                while(scanner.hasNext())
-                {
-                    stringBuilder.append(scanner.next());
-                }
-                String result=stringBuilder.toString();
-                JSONArray posts=new JSONArray(result);
-                for(int i=0;i<posts.length();i++)
-                {
-                    JSONObject item=posts.getJSONObject(i);
-                    String user_name=item.getString("name");
-                    String password=item.getString("password");
-                    String user_id=item.getString("user_id");
-                    String context=item.getString("context");
-                    long post_id=item.getLong("post_id");
-                    Posts post=new Posts(new MyDatabase.User(user_id,user_name,password),context);
-                    post.setId(post_id);
-                    postsList.add(post);
-                }
-                inputStream.close();
-                scanner.close();
-            }
-            catch(Exception e)
-            {
-                Log.d("error",e.getLocalizedMessage());
-            }
-            return postsList;
+    protected T doInBackground(String... strings) {
+        return internetActivity.doInBackground(strings);
     }
-    protected void onPostExecute(ArrayList<Posts>posts)
-    {
+
+    protected void onPostExecute(T posts) {
         super.onPostExecute(posts);
-        internetActivity.onPostExecute(posts);
+        downloadComplete.onDownloadComplete(posts);
     }
-    protected  void onPreExecute(ArrayList<Posts>posts)
-    {
+
+    protected void onPreExecute(T posts) {
         internetActivity.onPreExecute(posts);
     }
+
+    public static String connectionResult(String urlLink) {
+        String result="";
+        try {
+            URL url = new URL(urlLink);
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            httpURLConnection.setRequestMethod("GET");
+            httpURLConnection.connect();
+            InputStream inputStream = httpURLConnection.getInputStream();
+            Scanner scanner = new Scanner(inputStream);
+            StringBuilder stringBuilder = new StringBuilder();
+            while (scanner.hasNext()) {
+                stringBuilder.append(scanner.next());
+            }
+            result= stringBuilder.toString();
+            inputStream.close();
+            scanner.close();
+        }
+        catch (Exception e) {
+        }
+        finally {
+            return result;
+        }
+    }
+}
+interface OnDownloadComplete<T>{
+    void onDownloadComplete(T result);
 }
