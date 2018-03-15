@@ -364,6 +364,7 @@ class LoginNetworking extends AsyncTask<String,Void,Bundle> {
         super.onPostExecute(result);
         loginInterface.onPostExecute(result);
     }
+
 }
 interface LoginInterface{
      void onPostExecute(Bundle result);

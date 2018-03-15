@@ -1,5 +1,6 @@
 package othello.com.example.bhavneetsingh.notes;
 
+import android.animation.LayoutTransition;
 import android.app.Dialog;
 import android.app.LauncherActivity;
 import android.app.Notification;
@@ -16,9 +17,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseLockedException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.drm.DrmStore;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.provider.Telephony;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -32,7 +36,11 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.transition.AutoTransition;
 import android.transition.Explode;
+import android.transition.Fade;
+import android.transition.Slide;
+import android.transition.Visibility;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -48,6 +56,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -85,12 +94,14 @@ public class MainActivity extends AppCompatActivity implements  PostListAdapter.
     private PostListAdapter adapter;
     private  ListView list;
     private EditText editText;
-    private android.app.AlertDialog.Builder builder;//for Profile Photo
+    //for Profile Photo
+    PopupWindow profilePic;
     private MyDatabase db_helper;//My Databse
     private Bundle user_bundle;
     private DrawerLayout drawer;
     private ProgressBar bar;
     private MyDatabase.User current_user;
+    private final HashMap<String,Integer>followers=new HashMap<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,12 +137,20 @@ public class MainActivity extends AppCompatActivity implements  PostListAdapter.
         else {
             login();
         }
+        //Following maps
+        DBManager.getFollowers(current_user.getUser_id(), new OnDownloadComplete<HashMap<String, Integer>>() {
+            @Override
+            public void onDownloadComplete(HashMap<String, Integer> result) {
+                followers.clear();
+                followers.putAll(result);
+            }
+        });
         //
         TextView header_name=(TextView)navigationView.getHeaderView(0).findViewById(R.id.navigation_header);
         header_name.setText(current_user.getName());
         TextView header_id=(TextView)navigationView.getHeaderView(0).findViewById(R.id.navigation_id);
         header_id.setText(current_user.getUser_id());
-        //For Welcoming
+        //For Welcoming Toast
         Toast.makeText(this, "Welcome", Toast.LENGTH_SHORT).show();
         editText = (EditText) findViewById(R.id.postText);
         adapter = new PostListAdapter(this, postList, this);
@@ -140,11 +159,15 @@ public class MainActivity extends AppCompatActivity implements  PostListAdapter.
         list = (ListView) findViewById(R.id.allPosts);
         list.setAdapter(adapter);
         list.setClickable(true);
+        switcBars(true);
         refresh();
         FloatingActionButton button=(FloatingActionButton)findViewById(R.id.fab);
         button.setOnClickListener(this);
-        builder=new android.app.AlertDialog.Builder(this);
+        //Initializing Popup menu
+        profilePic=new PopupWindow(this);
     }
+    //storing followerlist
+    //login
     public void login()
     {
         SharedPreferences sharedPreferences;
@@ -281,6 +304,7 @@ public class MainActivity extends AppCompatActivity implements  PostListAdapter.
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==R.id.refresh)
         {
+            switcBars(true);
             refresh();
         }
         else if(item.getItemId()==R.id.sugestions)
@@ -292,25 +316,63 @@ public class MainActivity extends AppCompatActivity implements  PostListAdapter.
         }
         return true;
     }
+    //Switching progressbar and list
+    public void switcBars(boolean check)
+    {
+        if(check)
+        {
+            list.setVisibility(View.GONE);
+            bar.setVisibility(View.VISIBLE);
+
+        }
+        else
+        {
+            list.setVisibility(View.VISIBLE);
+            bar.setVisibility(View.GONE);
+
+        }
+    }
     //Refreshing
     private void refresh()
     {
-      final  ProgressBar bar=findViewById(R.id.progressBar);
-       list.setVisibility(View.GONE);
-       bar.setVisibility(View.VISIBLE);
-        DBManager.fetchList(current_user, new OnDownloadComplete<ArrayList<Posts>>() {
+              DBManager.fetchList(current_user, new OnDownloadComplete<ArrayList<Posts>>() {
             @Override
             public void onDownloadComplete(ArrayList<Posts> result) {
               if(result!=null)
               {
-                  list.setVisibility(View.VISIBLE);
-                  bar.setVisibility(View.GONE);
                   postList.clear();
                   postList.addAll(result);
+                  adapter.notifyDataSetChanged();
+                  switcBars(false);
+                  //for loading profilepictres
+                  ArrayList<URL>urls=new ArrayList<>();
+                  for(int i=0;i<postList.size();i++)
+                  {
+                      urls.add(postList.get(i).getUser().getProfilePictureUrl());
+                  }
+                  loadImages(urls,new OnDownloadComplete<ArrayList<Bitmap>>() {
+                      @Override
+                      public void onDownloadComplete(ArrayList<Bitmap> result) {
+                          addProfileImages(result);
+                      }
+                  });
+                  //For loading images
+                  urls.clear();
+                  for(int i=0;i<postList.size();i++)
+                  {
+                      urls.add(postList.get(i).getImgUrl());
+                  }
+                  loadImages(urls,new OnDownloadComplete<ArrayList<Bitmap>>() {
+                      @Override
+                      public void onDownloadComplete(ArrayList<Bitmap> result) {
+                          addImages(result);
+                      }
+                  });
                   adapter.notifyDataSetChanged();
               }
             }
         });
+
     }
 /*
 * When Post is created then result from post activity is added to list in main activity*/
@@ -319,16 +381,26 @@ public class MainActivity extends AppCompatActivity implements  PostListAdapter.
             if (resultCode == MAINACTIVITY) {
                 if (data != null) {
 
+                    String url=data.getStringExtra(PostActivity.IMAGE);
                     String text = data.getStringExtra(MyDatabase.KEY_CONTEXT);
                     int smileyId = data.getIntExtra(MyDatabase.KEY_SMILEY, R.drawable.smiley);
                     Bundle bundle = new Bundle();
                     bundle.putString(MyDatabase.KEY_CONTEXT, text);
                     bundle.putInt(MyDatabase.KEY_SMILEY, smileyId);
-                    Posts posts = null;
+                    switcBars(true);
                     //Storing new Post in Databse
-                    posts = DBManager.addPost(db_helper, bundle,current_user);
-                    postList.add(0,posts);
-                    adapter.notifyDataSetChanged();
+                     DBManager.addPost(current_user,text, new OnDownloadComplete<Posts>() {
+                        @Override
+                        public void onDownloadComplete(Posts result) {
+                           if(result!=null)
+                           {
+                               postList.add(0,result);
+                               refresh();
+                               switcBars(false);
+                           }
+                        }
+                    });
+
                 }
             }
             else if (resultCode == EDITPOST)
@@ -338,43 +410,109 @@ public class MainActivity extends AppCompatActivity implements  PostListAdapter.
                     String text = data.getStringExtra(MyDatabase.KEY_CONTEXT);
                     int smileyId = data.getIntExtra(MyDatabase.KEY_SMILEY, R.drawable.smiley);
                     int position = data.getIntExtra("position", -1);
+                    String url=data.getStringExtra(PostActivity.IMAGE);
                     Bundle bundle = new Bundle();
                     if (position >= 0) {
                         postList.get(position).setContent(text);
                         long id = postList.get(position).getId();
-                        Posts posts = null;
+                        Posts post = postList.get(position);
                         //Storing existing Post in Databse
-                        DBManager.update(db_helper, postList.get(position));
+                        switcBars(true);
                         postList.get(position).setContent(text);
+                        try
+                        {
+                            postList.get(position).setImgUrl(url);
+                        }
+                        catch(Exception e)
+                        {
+
+                        }
+
+                        DBManager.editPost(post, new OnDownloadComplete<Posts>() {
+                            @Override
+                            public void onDownloadComplete(Posts result) {
+                                refresh();
+                            switcBars(false);
+                            }
+                        });
+
                     }
-                    adapter.notifyDataSetChanged();
                 }
             }
         }
     }
-
     public static final int EDITPOST=10;
     //When profile photo is clicked
     private View convertView;
-    private android.app.AlertDialog dialog = null;
-
     @Override
-    public void onClickIcon() {
+    public void onClickIcon(View view,int position) {
 
         {
             if (convertView == null) {
                 LayoutInflater inflater = getLayoutInflater();
-                convertView = inflater.inflate(R.layout.icon_view, null);
-                ((ImageView) convertView.findViewById(R.id.icon_image)).setImageResource(R.drawable.icon2);
-                builder.setView(convertView);
-                dialog = builder.create();
-                dialog.show();
-            } else {
-                dialog.show();
+                convertView = inflater.inflate(R.layout.icon_view, list,false);
+                //Setting Proflie Image
+                profilePic.setContentView(convertView);
             }
-            dialog.getWindow().setLayout(1000, 1000);
+            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                 profilePic.setEnterTransition(new Slide());
+                 profilePic.setOverlapAnchor(false);
+                 profilePic.setExitTransition(new Slide());
+            }
 
+            View v=((ImageView)convertView.findViewById(R.id.follow));
+            String user_id=postList.get(position).getUser().getUser_id();
+            if(!current_user.getUser_id().equals(postList.get(position).getUser().getUser_id()))
+            {
+                if(followers.containsKey(user_id))
+                {
+                    v.setAlpha((float)1);
+                }
+                else {
+                    v.setAlpha((float) 0.5);
+                }
+            }
+            else
+            {
+                v.setAlpha((float)0.5);
+            }
+            ImageView imageView=(ImageView)convertView.findViewById(R.id.icon_image);
+            if(postList.get(position).getUser().getProfilePicture()!=null)
+            (imageView).setImageBitmap(postList.get(position).getUser().getProfilePicture());
+            ((TextView)convertView.findViewById(R.id.icon_title)).setText(postList.get(position).getUser().getName());
+            final int pos=position;
+            ((ImageView)convertView.findViewById(R.id.follow)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    follow(v,pos);
+                }
+            });
+            profilePic.setElevation(20);
+            profilePic.setFocusable(true);
+            View root=findViewById(R.id.content_home);
+            profilePic.showAtLocation(root,Gravity.CENTER,0,0);
         }
+    }
+    //Searching in UsersList
+
+    //Following process
+    public void follow(View v,int position)
+    {
+        String user_id=postList.get(position).getUser().getUser_id();
+        if(!current_user.getUser_id().equals(postList.get(position).getUser().getUser_id()))
+
+        {
+            if(followers.containsKey(user_id))
+        {
+            v.setAlpha((float)1);
+            followers.remove(user_id);
+            DBManager.deleteFollower(current_user.getUser_id(),user_id);
+        }
+        else {
+            followers.put(user_id,1);
+            v.setAlpha((float)0.5);
+            DBManager.addFollower(current_user.getUser_id(),user_id);
+        }}
     }
     //When menuitem of posts is clicked
     public void onClickPopupMenu(MenuItem menuItem, int pos) {
@@ -399,7 +537,11 @@ public class MainActivity extends AppCompatActivity implements  PostListAdapter.
                 if(postList.size()>0){
                     Posts posts=postList.get(pos);
                     Log.d("error",pos+"");
-                    DBManager.delete(db_helper,posts.getId());
+                    DBManager.delete(posts.getId(), new OnDownloadComplete<Posts>() {
+                        @Override
+                        public void onDownloadComplete(Posts result) {
+                        }
+                    });
                     postList.remove(pos);
                     adapter.notifyDataSetChanged();
             }
@@ -473,7 +615,11 @@ public class MainActivity extends AppCompatActivity implements  PostListAdapter.
                 public void onClick(View v) {
                     button.setImageResource(map.get(k));
                     posts.setSmiley_id(map.get(k));
-                    DBManager.update(db_helper,postList.get(pos));
+                    DBManager.editPost(posts, new OnDownloadComplete<Posts>() {
+                        @Override
+                        public void onDownloadComplete(Posts result) {
+                        }
+                    });
                     window.dismiss();
                 }
             });
@@ -485,7 +631,58 @@ public class MainActivity extends AppCompatActivity implements  PostListAdapter.
         likeClicked = true;
     }
    //Creating Post
+    public void loadImages(ArrayList<URL>images,OnDownloadComplete<ArrayList<Bitmap>>downloadComplete)
+    {
+        Networking<URL,ArrayList<Bitmap>>networking=new Networking<>(new InternetActivity<URL, ArrayList<Bitmap>>() {
 
+            @Override
+            public ArrayList<Bitmap> doInBackground(URL... args) {
+                ArrayList<Bitmap>bitmaps=new ArrayList<>();
+                for(URL url:args)
+                {  try{
+                    bitmaps.add(getImage(url));
+                }
+                catch (Exception e)
+                {
+                   bitmaps.add(null);
+                }
+             }
+             return bitmaps;
+            }
+
+            @Override
+            public void onPostExecute(ArrayList<Bitmap> result) {
+
+            }
+
+            @Override
+            public void onPreExecute(ArrayList<Bitmap> result) {
+
+            }
+        },downloadComplete);
+        URL[] arr=new URL[postList.size()];
+        for(int i=0;i<postList.size();i++)
+            arr[i]=images.get(i);
+        networking.execute(arr);
+    }
+    public void addImages(ArrayList<Bitmap>result)
+    {
+        for(int i=0;i<result.size();i++){
+
+            postList.get(i).setBitmap(result.get(i));
+        }
+        adapter.notifyDataSetChanged();
+
+    }
+    private void addProfileImages(ArrayList<Bitmap>result)
+    {
+        for(int i=0;i<result.size();i++){
+
+            postList.get(i).getUser().setProfilePicture(result.get(i));
+        }
+        adapter.notifyDataSetChanged();
+
+    }
     public void onClick(View view) {
         if(view.getId()==R.id.fab)
         {
@@ -550,4 +747,20 @@ public class MainActivity extends AppCompatActivity implements  PostListAdapter.
         startActivityForResult(intent, PostActivity.POSTACTIVITY);
     }
 
+    private Bitmap getImage(URL url)
+    {
+        Bitmap bitmap=null;
+        try {
+
+            HttpURLConnection httpURLConnection=(HttpURLConnection)url.openConnection();
+            httpURLConnection.setRequestMethod("GET");
+            InputStream in=httpURLConnection.getInputStream();
+            bitmap= BitmapFactory.decodeStream(in);
+        }
+        catch(Exception e)
+        {
+            bitmap=null;
+        }
+        return bitmap;
+    }
 }

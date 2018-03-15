@@ -14,10 +14,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Comment;
 
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
 public class DBManager {
     //check connection
@@ -74,13 +76,13 @@ public class DBManager {
     public static ArrayList<Posts> fetchList(MyDatabase.User user,OnDownloadComplete downloadComplete)
     {
          final ArrayList<Posts>posts=new ArrayList<>();
-        Networking<ArrayList<Posts>> networking=new Networking<>(new InternetActivity<ArrayList<Posts>>() {
+        Networking<String,ArrayList<Posts>> networking=new Networking<>(new InternetActivity<String,ArrayList<Posts>>() {
 
             @Override
             public ArrayList<Posts> doInBackground(String... strings) {
                 String url=strings[0];
                 String result=Networking.connectionResult(url);
-             return getPosts(result);
+             return getPosts(result,true);
             }
             @Override
 
@@ -113,7 +115,7 @@ public class DBManager {
             String usern=cursor.getString(cursor.getColumnIndex(MyDatabase.User.NAME));
             String userp=cursor.getString(cursor.getColumnIndex(MyDatabase.User.PASSWORD));
             String useri=cursor.getString(cursor.getColumnIndex(MyDatabase.User.USER_ID));
-            Posts posts=new Posts(new MyDatabase.User(useri,usern,userp),content);
+            Posts posts=new Posts(new MyDatabase.User(useri,usern,userp),content,0);
             posts.setSmiley_id(smiley);
             posts.setId(id);
             postsArrayList.add(posts);
@@ -139,7 +141,7 @@ public class DBManager {
             String usern=cursor.getString(cursor.getColumnIndex(MyDatabase.User.NAME));
             String userp=cursor.getString(cursor.getColumnIndex(MyDatabase.User.PASSWORD));
             String useri=cursor.getString(cursor.getColumnIndex(MyDatabase.User.USER_ID));
-            Posts posts=new Posts(new MyDatabase.User(useri,usern,userp),content);
+            Posts posts=new Posts(new MyDatabase.User(useri,usern,userp),content,0);
             posts.setSmiley_id(smiley);
             posts.setId(id);
             postsArrayList.add(posts);
@@ -148,52 +150,86 @@ public class DBManager {
 
     }
     //Add Post
-    public static Posts addPost(SQLiteOpenHelper db_helper, Bundle bundle,MyDatabase.User current_user)
+    public static Posts addPost(MyDatabase.User user,String context,OnDownloadComplete<Posts> downloadComplete)
     {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date();
-        SQLiteDatabase db=db_helper.getWritableDatabase();
-        ContentValues contentValues=new ContentValues();
-        contentValues.put(MyDatabase.KEY_CONTEXT,bundle.getString(MyDatabase.KEY_CONTEXT));
-        contentValues.put(MyDatabase.KEY_SMILEY,bundle.getInt(MyDatabase.KEY_SMILEY));
-        contentValues.put(MyDatabase.KEY_DATE,dateFormat.format(date));
-        contentValues.put(MyDatabase.User.USER_ID,current_user.getUser_id());
-        long id = db.insert(MyDatabase.KEY_TABLE,null,contentValues);
-        Log.d("Name",current_user.getName());
-        Posts posts=new Posts(current_user,bundle.getString(MyDatabase.KEY_CONTEXT));
-        posts.setSmiley_id(bundle.getInt(MyDatabase.KEY_SMILEY));
-        posts.setId(id);
-        return posts;
+        Networking<String,Posts> networking=new Networking<>(new InternetActivity<String,Posts>() {
+
+            @Override
+            public Posts doInBackground(String... strings) {
+                Posts post=null;
+                String url=strings[0];
+                String result=Networking.connectionResult(url);
+                ArrayList<Posts>posts=getPosts(result,false);
+                try {
+                    post=posts.get(0);
+                }
+                catch (Exception e)
+                {
+
+                }
+                finally {
+                    return post;
+                }
+            }
+            @Override
+
+            public void onPostExecute(Posts result) {
+            }
+            @Override
+            public void onPreExecute(Posts result) {
+
+            }
+        },downloadComplete);
+        String url="https://triads.herokuapp.com/insert?id="+user.getUser_id()+"&post="+context;
+        networking.execute(url);
+        return null;
     }
     //Delete Post
-    public static void delete(SQLiteOpenHelper db_helper,long id)
+    public static void delete(long post_id,OnDownloadComplete<Posts>downloadComplete)
     {
-        SQLiteDatabase db=db_helper.getWritableDatabase();
-        String arr[]=new String[1];
-        arr[0]=id+"";
-        db.delete(MyDatabase.KEY_TABLE,MyDatabase.KEY_ID+" = ?",arr);
+        Networking<String,Posts> networking=new Networking<>(new InternetActivity<String, Posts>() {
+            @Override
+            public Posts doInBackground(String... strings) {
+                String url=strings[0];
+                String result=Networking.connectionResult(url);
+                return  null;
+            }
+            @Override
+            public void onPostExecute(Posts result) {
 
+            }
+            @Override
+            public void onPreExecute(Posts result) {
+
+            }
+        }, downloadComplete);
+        String url="https://triads.herokuapp.com/delete?post_id="+post_id;
+        networking.execute(url);
     }
     //Update Post
-    public static void update(SQLiteOpenHelper db_helper,Posts post)
+    public static void editPost(Posts post,OnDownloadComplete<Posts> downloadComplete)
     {
+        Networking<String,Posts> networking=new Networking<>(new InternetActivity<String, Posts>() {
+            @Override
+            public Posts doInBackground(String... strings) {
+                String url=strings[0];
+                String result=Networking.connectionResult(url);
+                return  null;
+            }
 
-        SQLiteDatabase db=db_helper.getWritableDatabase();
-        long id=post.getId();
-        String text=post.getContent();
-        int smileyId=post.getSmiley_id();
-        Bundle bundle=new Bundle();
-        bundle.putString(MyDatabase.KEY_CONTEXT, text);
-        bundle.putInt(MyDatabase.KEY_SMILEY, smileyId);
-        String arr[]=new String[1];
-        arr[0]=id+"";
-        ContentValues contentValues=new ContentValues();
-        contentValues.put(MyDatabase.KEY_CONTEXT,bundle.getString(MyDatabase.KEY_CONTEXT));
-        contentValues.put(MyDatabase.KEY_SMILEY,bundle.getInt(MyDatabase.KEY_SMILEY));
-        contentValues.put(MyDatabase.User.USER_ID,post.getUser().getUser_id());
-        db.update(MyDatabase.KEY_TABLE,contentValues,MyDatabase.KEY_ID+" = ?",arr);
+            @Override
+            public void onPostExecute(Posts result) {
 
-    }
+            }
+
+            @Override
+            public void onPreExecute(Posts result) {
+
+            }
+        }, downloadComplete);
+        String url="https://triads.herokuapp.com/edit?post_id="+post.getId()+"&context="+post.getContent()+"&smiley="+post.getSmiley_id()+"&image="+post.getImgUrl();
+        networking.execute(url);
+     }
     public static MyDatabase.Comment addComment(SQLiteOpenHelper db_helper,Bundle bundle)
     {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -247,8 +283,107 @@ public class DBManager {
         long id=db.insert(MyDatabase.User.TABLE,null,contentValues);
         return !(id==-1);
     }
+    //getting followers list
+    public static void getFollowers(String user_id,OnDownloadComplete<HashMap<String,Integer>>downloadComplete)
+    {
+        Networking<String,HashMap<String,Integer>> networking=new Networking<>(new InternetActivity<String,HashMap<String, Integer>>() {
+
+            @Override
+            public HashMap<String, Integer> doInBackground(String... args) {
+                String url=args[0];
+                String result=Networking.connectionResult(url);
+                return  getFollowers(result);
+            }
+
+            @Override
+            public void onPostExecute(HashMap<String, Integer> result) {
+
+            }
+
+            @Override
+            public void onPreExecute(HashMap<String, Integer> result) {
+
+            }
+        }, downloadComplete);
+        String url="https://triads.herokuapp.com/followers?source="+user_id;
+        networking.execute(url);
+    }
+    public static void addFollower(String source,String target)
+    {
+        Networking<String,Boolean> networking=new Networking<>(new InternetActivity<String, Boolean>() {
+            @Override
+            public Boolean doInBackground(String... args) {
+                String url=args[0];
+                String result=Networking.connectionResult(url);
+                return null;
+            }
+
+            @Override
+            public void onPostExecute(Boolean result) {
+
+            }
+
+            @Override
+            public void onPreExecute(Boolean result) {
+
+            }
+        }, new OnDownloadComplete<Boolean>() {
+            @Override
+            public void onDownloadComplete(Boolean result) {
+
+            }
+        });
+        String url="https://triads.herokuapp.com/addFollower?source="+source+"&target="+target;
+        networking.execute(url);
+    }
+    public static void deleteFollower(String source,String target)
+    {
+
+        Networking<String,Boolean> networking=new Networking<>(new InternetActivity<String, Boolean>() {
+            @Override
+            public Boolean doInBackground(String... args) {
+                String url=args[0];
+                String result=Networking.connectionResult(url);
+                return null;
+            }
+
+            @Override
+            public void onPostExecute(Boolean result) {
+
+            }
+
+            @Override
+            public void onPreExecute(Boolean result) {
+
+            }
+        }, new OnDownloadComplete<Boolean>() {
+            @Override
+            public void onDownloadComplete(Boolean result) {
+
+            }
+        });
+        String url="https://triads.herokuapp.com/deleteFollower?source="+source+"&target="+target;
+        networking.execute(url);
+    }
+    public static HashMap<String,Integer> getFollowers(String result)
+    {
+        HashMap<String,Integer>followers=new HashMap<>();
+        try{
+        JSONArray array=new JSONArray(result);
+        for(int i=0;i<array.length();i++)
+        {
+            JSONObject item=array.getJSONObject(i);
+            followers.put(item.getString("target"),item.getInt("weight"));
+        }
+        }
+        catch (Exception e)
+        {
+
+        }
+        return followers;
+    }
     //Getting Posts
-    public static ArrayList<Posts> getPosts(String result)
+    public static ArrayList<Posts> getPosts(String result,boolean select)
     {
         ArrayList<Posts> postsList =new ArrayList<>();
         try{
@@ -257,18 +392,25 @@ public class DBManager {
             {
                 JSONObject item=posts.getJSONObject(i);
                 String user_name=item.getString("name");
-                String password=item.getString("password");
+                String password="";
                 String user_id=item.getString("user_id");
                 String context=item.getString("context");
                 long post_id=item.getLong("post_id");
-                Posts post=new Posts(new MyDatabase.User(user_id,user_name,password),context);
+                int smiley=item.getInt("smiley");
+                String img=item.getString("image");
+                String url=item.getString("profile_picture");
+                MyDatabase.User user=new MyDatabase.User(user_id,user_name,password);
+                user.setProfilePictureUrl(url);
+                Posts post=new Posts(user,context,post_id);
                 post.setId(post_id);
+                    post.setImgUrl(img);
+                post.setSmiley_id(smiley);
                 postsList.add(post);
             }
         }
         catch(Exception e)
         {
-            Log.d("error",e.getLocalizedMessage());
+            Log.d("error_json",e.getLocalizedMessage());
         }
         return  postsList;
     }

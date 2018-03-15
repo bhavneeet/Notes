@@ -3,8 +3,11 @@ package othello.com.example.bhavneetsingh.notes;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
 import android.util.Pair;
 import android.widget.GridLayout;
+
+import java.net.URL;
 
 
 public class MyDatabase extends SQLiteOpenHelper {
@@ -94,8 +97,10 @@ public class MyDatabase extends SQLiteOpenHelper {
         }
     }
     static class User{
-        public static final String NAME="NAME",PASSWORD="PASSWORD",USER_ID="USER_ID",TABLE="USER";
+        public static final String NAME="NAME",PASSWORD="PASSWORD",USER_ID="USER_ID",TABLE="USER",PROFILE_PICTURE="imgurl";
         private String name,password,user_id;
+        private URL profilePictureUrl=null;
+        private Bitmap profilePicture=null;
 
         public User(String user_id, String name, String password) {
             this.name = name;
@@ -119,8 +124,35 @@ public class MyDatabase extends SQLiteOpenHelper {
             this.password = password;
         }
 
+        public URL getProfilePictureUrl() {
+            return profilePictureUrl;
+        }
+
+        public void setProfilePictureUrl(String profilePictureUrl) {
+            try{
+
+                this.profilePictureUrl = new URL(profilePictureUrl);
+                String host=this.profilePictureUrl.getHost();
+                if(!host.equals("scontent-bom1-1.xx.fbcdn.net"))
+                    throw new Exception("Profile picture must br from facebook");
+            }
+            catch(Exception e)
+            {
+                this.profilePictureUrl=null;
+            }
+        }
+
+        public Bitmap getProfilePicture() {
+            return profilePicture;
+        }
+
+        public void setProfilePicture(Bitmap profilePicture) {
+            this.profilePicture = profilePicture;
+        }
+
         public String getUser_id() {
             return user_id;
+
         }
 
         public void setUser_id(String user_id) {

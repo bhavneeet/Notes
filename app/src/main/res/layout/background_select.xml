@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialog"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/url"
+        style="@style/button"
+        android:layout_width="@dimen/login_wid"
+        android:layout_height="@dimen/login_hei"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="45dp"
+        android:background="@drawable/button_gradient"
+        android:hint="Image Url"
+        android:singleLine="true"
+        android:textColor="@color/cardview_light_background" />
+
+    <Button
+        android:id="@+id/submit_button"
+        android:layout_width="80dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/url"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="22dp"
+        android:background="@drawable/button_gradient"
+        android:fontFamily="casual"
+        android:text="Submit"
+        android:textColor="@color/cardview_light_background"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+</RelativeLayout>

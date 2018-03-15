@@ -24,7 +24,7 @@ import pl.droidsonroids.gif.GifImageView;
 
 public class PostListAdapter extends BaseAdapter {
         public interface OnClickIcon{
-            void onClickIcon();
+            void onClickIcon(View view,int position);
         }
     private Activity context;
     private ArrayList<Posts> posts;
@@ -53,31 +53,27 @@ public class PostListAdapter extends BaseAdapter {
         return posts.get(position);
     }
 
-
-
     @Override
     public long getItemId(int position) {
         return posts.get(position).getId();
     }
 
-    public View getView(final int pos, View convertView, ViewGroup parent)
+    public View getView( int pos, View convertView, ViewGroup parent)
     {
 
         LayoutInflater inflater=context.getLayoutInflater();
         PostHolder holder=new PostHolder();
-
-        Log.d("Positon",pos+""+posts.get(pos).getUser().getUser_id());
         if(convertView==null)
         {
            convertView=inflater.inflate(R.layout.post_list_layout,parent,false);
            holder.textView=(TextView)convertView.findViewById(R.id.postListText);
+           holder.imageView=(ImageView)convertView.findViewById(R.id.post_image);
+           holder.profileImage=(ImageView)convertView.findViewById(R.id.profile_image);
            Button but=(Button)convertView.findViewById(R.id.pop_up_button);
            final PopupMenu menu=new PopupMenu(context,but);
            menu.getMenuInflater().inflate(R.menu.pop_up_menu,menu.getMenu());
            holder.menu=menu;
            holder.button=but;
-
-
            convertView.setTag(holder);
         }
         else
@@ -85,11 +81,14 @@ public class PostListAdapter extends BaseAdapter {
             holder=(PostHolder)convertView.getTag();
 
         }
+        if(posts.get(pos).getUser().getProfilePicture()!=null)
+            holder.profileImage.setImageBitmap(posts.get(pos).getUser().getProfilePicture());
         holder.textView.setText(posts.get(pos).getContent());
+        holder.imageView.setImageBitmap(posts.get(pos).getBitmap());
         TextView textView=(TextView)convertView.findViewById(R.id.profile_name);
         textView.setText(posts.get(pos).getUser().getName());
         final PopupMenu menu=holder.menu;
-
+        final int position=pos;
         holder.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,24 +101,23 @@ public class PostListAdapter extends BaseAdapter {
 
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
-                    clicksListener.onClickPopupMenu(item,pos);
+                    clicksListener.onClickPopupMenu(item,position);
                      return true;
                 }
             });
         }
-        final ImageView icon=(ImageView)convertView.findViewById(R.id.profile_image);
+        final ImageView icon=holder.profileImage;
         icon.setClickable(true);
         icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onClickIcon();
+                listener.onClickIcon(v,position);
             }
         });
         final ImageButton button[]=new ImageButton[2];
         button[0]=(ImageButton)convertView.findViewById(R.id.comment_button);
         button[1]=(ImageButton) convertView.findViewById(R.id.share_button);
         final View copy=convertView;
-        final int position=pos;
         final GifImageView like=(GifImageView)convertView.findViewById(R.id.like_button);
         like.setImageResource(posts.get(pos).getSmiley_id());
         like.setOnClickListener(new View.OnClickListener() {
@@ -158,4 +156,5 @@ class PostHolder{
     ImageView imageView;
     PopupMenu menu;
     Button button;
+    ImageView profileImage;
 }

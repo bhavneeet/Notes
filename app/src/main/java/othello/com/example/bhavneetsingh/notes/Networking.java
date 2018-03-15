@@ -7,18 +7,19 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
 
-public class Networking<T> extends AsyncTask<String,Void,T> {
+public class Networking<V,T> extends AsyncTask<V,Void,T> {
 
-    private InternetActivity<T> internetActivity;
+    private InternetActivity<V,T> internetActivity;
     private OnDownloadComplete<T> downloadComplete;
-    public Networking(InternetActivity<T> internetActivity,OnDownloadComplete<T>downloadComplete) {
+    public Networking(InternetActivity<V,T> internetActivity,OnDownloadComplete<T>downloadComplete) {
         this.internetActivity = internetActivity;
         this.downloadComplete=downloadComplete;
     }
 
+
     @Override
-    protected T doInBackground(String... strings) {
-        return internetActivity.doInBackground(strings);
+    protected T doInBackground(V[] vs) {
+        return internetActivity.doInBackground(vs);
     }
 
     protected void onPostExecute(T posts) {
@@ -41,7 +42,7 @@ public class Networking<T> extends AsyncTask<String,Void,T> {
             Scanner scanner = new Scanner(inputStream);
             StringBuilder stringBuilder = new StringBuilder();
             while (scanner.hasNext()) {
-                stringBuilder.append(scanner.next());
+                stringBuilder.append(scanner.next()+" ");
             }
             result= stringBuilder.toString();
             inputStream.close();

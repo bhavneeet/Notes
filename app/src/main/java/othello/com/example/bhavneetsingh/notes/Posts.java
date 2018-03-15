@@ -1,23 +1,51 @@
 package othello.com.example.bhavneetsingh.notes;
 
+import android.graphics.Bitmap;
+
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-/**
- * Created by bhavneet singh on 17-Feb-18.
- */
 
 public class Posts {
     private String content;
     private int smiley_id;
-    long id;
+    private long id;
+    private URL imgUrl;
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
+
+    private Bitmap bitmap;
+    public URL getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl)  {
+            try{
+                this.imgUrl = new URL(imgUrl);
+            }
+            catch (Exception e)
+            {
+
+            }
+    }
+
     private ArrayList<String>comment;
     private MyDatabase.User user;
-    public Posts(MyDatabase.User user,String content) {
+    public Posts(MyDatabase.User user,String content,long id) {
         this.content = content;
         this.user=user;
         this.smiley_id = R.drawable.smiley;
+        this.id=id;
+        imgUrl=null;
     }
 
     public String getContent() {

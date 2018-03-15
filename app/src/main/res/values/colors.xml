@@ -6,4 +6,6 @@
     <color name="colorWhite">#ffffff</color>
     <color name="button">#467032</color>
     <color name="background_material_light">#de5959</color>
+    <color name="redTransparent">#64000000</color>
+    <color name="follow">#64ffffff</color>
 </resources>

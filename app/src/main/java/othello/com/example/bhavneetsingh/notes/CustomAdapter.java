@@ -49,7 +49,6 @@ public class CustomAdapter extends BaseAdapter  {
         {
             holder=(IconHolder)convertView.getTag();
         }
-        holder.imageView.setImageResource(icons.get(position).getImage());
         holder.textView.setText(icons.get(position).getText());
         return convertView;    }
     public View  getDropDownView(int position, View convertView, ViewGroup parent)
@@ -67,7 +66,6 @@ public class CustomAdapter extends BaseAdapter  {
         {
             holder=(IconHolder)convertView.getTag();
         }
-        holder.imageView.setImageResource(icons.get(position).getImage());
         holder.textView.setText(icons.get(position).getText());
         return convertView;
     }
