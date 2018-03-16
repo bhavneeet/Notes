@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -48,7 +54,7 @@
         android:layout_below="@+id/new_username"
         android:layout_marginTop="12dp"
         android:background="@drawable/edit_background"
-        android:hint="Email"
+        android:hint="Github ID"
         android:inputType="textAutoComplete"
         android:lines="1"
         android:maxLength="40" />
@@ -121,3 +127,4 @@
         android:progressDrawable="@drawable/login_progress"
         android:layout_alignTop="@+id/register" />
 </RelativeLayout>
+</ScrollView>

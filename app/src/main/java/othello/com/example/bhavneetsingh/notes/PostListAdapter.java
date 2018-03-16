@@ -24,7 +24,7 @@ import pl.droidsonroids.gif.GifImageView;
 
 public class PostListAdapter extends BaseAdapter {
         public interface OnClickIcon{
-            void onClickIcon(View view,int position);
+            void onClickIcon(View view,MyDatabase.User user);
         }
     private Activity context;
     private ArrayList<Posts> posts;
@@ -58,7 +58,7 @@ public class PostListAdapter extends BaseAdapter {
         return posts.get(position).getId();
     }
 
-    public View getView( int pos, View convertView, ViewGroup parent)
+    public View getView(int pos, View convertView, ViewGroup parent)
     {
 
         LayoutInflater inflater=context.getLayoutInflater();
@@ -111,7 +111,7 @@ public class PostListAdapter extends BaseAdapter {
         icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onClickIcon(v,position);
+                listener.onClickIcon(v,posts.get(position).getUser());
             }
         });
         final ImageButton button[]=new ImageButton[2];

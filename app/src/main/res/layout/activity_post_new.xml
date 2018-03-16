@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <include
+        layout="@layout/activity_post" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/edit_icon"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginRight="16dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="10dp"
+        android:backgroundTint="#ffffff"
+        android:scaleType="center"
+        app:srcCompat="@drawable/edit_icon" />
+
+    <android.support.design.widget.FloatingActionButton
+
+        android:id="@+id/photo_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginBottom="100dp"
+        android:layout_marginRight="24dp"
+        app:layout_anchor="@id/edit_icon"
+        app:layout_anchorGravity="center"
+        android:background="@color/colorWhite"
+        android:scaleType="center"
+        app:fabSize="normal"
+        android:visibility="gone"
+        app:srcCompat="@drawable/photo" />
+    <android.support.design.widget.FloatingActionButton
+
+        android:id="@+id/camera_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginRight="24dp"
+        app:layout_anchor="@id/edit_icon"
+        app:layout_anchorGravity="center"
+        android:scaleType="center"
+        android:layout_marginBottom="170dp"
+        app:fabSize="normal"
+        android:visibility="gone"
+        app:srcCompat="@drawable/camera" />
+
+</android.support.design.widget.CoordinatorLayout>

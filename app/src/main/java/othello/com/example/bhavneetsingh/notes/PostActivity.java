@@ -4,12 +4,14 @@ import android.app.AlertDialog;
 import android.app.LauncherActivity;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -19,6 +21,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -40,10 +43,9 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-public class PostActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
+public class PostActivity extends AppCompatActivity implements View.OnClickListener{
 
     public static final String IMAGE="imageurl";
-    ArrayList<Icons>icons;
     CustomAdapter arrayAdapter;
     ArrayList<String>icons_name;
     ArrayList<Integer>images;
@@ -55,18 +57,11 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
     android.app.AlertDialog.Builder builder;
     private android.app.AlertDialog dialog = null;
     private String img;
+    FloatingActionButton[]icons;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_post);
-        spinner=(Spinner)findViewById(R.id.options_list);
-        icons_name=new ArrayList<>();
-        images=new ArrayList<>();
-        icons=new ArrayList<>();
-        arrayAdapter=new CustomAdapter(this,icons);
-        spinner.setAdapter(arrayAdapter);
-        spinner.setOnItemSelectedListener(this);
-        addIcons();
+        setContentView(R.layout.activity_post_new);
         editText=(EditText)findViewById(R.id.postText);
         Intent intent =getIntent();
         if(intent!=null)
@@ -77,34 +72,23 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
             editText.setText(start);
         }
         builder=new AlertDialog.Builder(this);
+        icons=new FloatingActionButton[3];
+        icons[0]=(FloatingActionButton)findViewById(R.id.edit_icon);
+        icons[1]=(FloatingActionButton)findViewById(R.id.camera_icon);
+        icons[2]=(FloatingActionButton)findViewById(R.id.photo_icon);
+        AlphaAnimation animation=new AlphaAnimation((float)0,1);
+        animation.setDuration(1000);
+        for(FloatingActionButton but:icons)
+        {
+            but.setAnimation(animation);
+            but.setOnClickListener(this);
+        }
     }
     public boolean onCreateOptionsMenu(Menu m)
     {
         MenuInflater inflater=getMenuInflater();
         inflater.inflate(R.menu.post_menu,m);
         return true;
-    }
-    public void initializeArray()
-    {
-        icons_name.add(" Photo");
-        icons_name.add(" BackgroundColor");
-        icons_name.add(" Check in");
-        icons_name.add(" Pin it");
-        icons_name.add(" Camera");
-        icons_name.add(" Feeling");
-        icons_name.add(" Views");
-        images.add(R.drawable.photo_icon);
-        images.add(R.drawable.background_icon);
-        images.add(R.drawable.checkin_icon);
-        images.add(R.drawable.pin_icon);
-        images.add(R.drawable.camera_icon1);
-        images.add(R.drawable.feeling_icon);
-        images.add(R.drawable.poll_icon);
-        for(int i=0;i<images.size();i++)
-        {
-            icons.add(new Icons(icons_name.get(i),images.get(i)));
-        }
-        arrayAdapter.notifyDataSetChanged();
     }
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -129,17 +113,59 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
         finish();
         return true;
     }
+    public void makeVisible(boolean check)
+    {
+        if(check)
+        {
+            AlphaAnimation animation=new AlphaAnimation((float)0,1);
+            animation.setDuration(250);
+            AlphaAnimation animation1=new AlphaAnimation((float)0,1);
+            animation.setDuration(500);
+            icons[1].startAnimation(animation);
+            icons[2].startAnimation(animation1);
+            icons[1].setVisibility(View.VISIBLE);
+            icons[2].setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            AlphaAnimation animation=new AlphaAnimation((float)1,0);
+            animation.setDuration(250);
+            AlphaAnimation animation1=new AlphaAnimation((float)1,0);
+            animation.setDuration(500);
+            icons[1].startAnimation(animation1);
+            icons[2].startAnimation(animation);
+            icons[1].setVisibility(View.GONE);
+            icons[2].setVisibility(View.GONE);
+        }
+    }
+    private boolean fabOpen=false;
+    public boolean fabOpen()
+    {
+        return icons[1].getVisibility()==View.VISIBLE;
+    }
     public void onClick(View view)
     {
+     if(view.getId()==R.id.edit_icon)
+     {
+         if(!fabOpen())
+         {
+             makeVisible(true);
+         }
+         else
+         {
+          makeVisible(false);
+         }
 
+     }
+     else if(view.getId()==R.id.photo_icon)
+     {
+         openDialog();
+     }
+     else if(view.getId()==R.id.camera_icon)
+     {
+
+     }
     }
-    public void addIcons()
-    {
-        initializeArray();
-
-    }
-
-
     public void setBackground(String url)
     {
         try{
@@ -151,47 +177,57 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
             img=null;
         }
     }
-
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if(position==0)
+    public static AlertDialog dialogBuilder(Context context)
+    {
+        AlertDialog dialog;
+        AlertDialog.Builder builder=new AlertDialog.Builder(context);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+        View convertView = inflater.inflate(R.layout.background_select, null);
+        builder.setView(convertView);
+        dialog = builder.create();
+        return dialog;
+    }
+    //open Dialog
+    public void openDialog()
+    {
+        View convertView=null;
+        if(dialog==null)
         {
-            View convertView=null;
-            if(dialog==null)
-            {
-                LayoutInflater inflater = getLayoutInflater();
-                convertView = inflater.inflate(R.layout.background_select, null);
-                builder.setView(convertView);
-                dialog = builder.create();
-                final View convert=convertView;
-                convertView.findViewById(R.id.submit_button).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        {
-                            String url= ((EditText)convert.findViewById(R.id.url)).getText().toString();
-                            setBackground(url);
-                            dialog.dismiss();
-                            try{
+            dialog=dialogBuilder(this);
+            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                }
+            });
+            final View convert=convertView;
+            convertView.findViewById(R.id.submit_button).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    {
+                        String url= ((EditText)convert.findViewById(R.id.url)).getText().toString();
+                        setBackground(url);
+                        dialog.dismiss();
+                        try{
 
-                                URL img=new URL(url);
-                                loadImage(img);
-                            }
-                            catch (Exception e)
-                            {
-                                setBackground(null);
-                            }
+                            URL img=new URL(url);
+                            loadImage(img);
+                        }
+                        catch (Exception e)
+                        {
+                            setBackground(null);
                         }
                     }
-                });
-                dialog.show();
-            }
-            else
-            {
-                dialog.show();
-            }
+                }
+            });
+            dialog.show();
         }
+        else
+        {
+            dialog.show();
+        }
+
     }
-    public void switvhBar(boolean check)
+    public void switchBar(boolean check)
     {
 
         ImageView imageView=findViewById(R.id.postImage);
@@ -210,7 +246,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
     }
     public void loadImage(URL imgUrl)
     {
-        switvhBar(true);
+        switchBar(true);
         Networking<URL,Bitmap>networking=new Networking<>(new InternetActivity<URL, Bitmap>() {
             @Override
             public Bitmap doInBackground(URL... args) {
@@ -249,7 +285,7 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
             public void onDownloadComplete(Bitmap result) {
              ImageView imageView=findViewById(R.id.postImage);
              imageView.setImageBitmap(result);
-                switvhBar(false);
+                switchBar(false);
             }
         });
         try{
@@ -260,8 +296,5 @@ public class PostActivity extends AppCompatActivity implements AdapterView.OnIte
             Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
     }
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
 
-    }
 }

@@ -150,14 +150,14 @@ public class DBManager {
 
     }
     //Add Post
-    public static Posts addPost(MyDatabase.User user,String context,OnDownloadComplete<Posts> downloadComplete)
+    public static Posts addPost(Posts post,OnDownloadComplete<Posts> downloadComplete)
     {
-        Networking<String,Posts> networking=new Networking<>(new InternetActivity<String,Posts>() {
+        Networking<Posts,Posts> networking=new Networking<>(new InternetActivity<Posts,Posts>() {
 
             @Override
-            public Posts doInBackground(String... strings) {
-                Posts post=null;
-                String url=strings[0];
+            public Posts doInBackground(Posts... args) {
+                Posts post=args[0];
+                String url="https://triads.herokuapp.com/insert?id="+post.getUser().getUser_id()+"&post="+post.getContent()+"&image="+post.getImgUrl();
                 String result=Networking.connectionResult(url);
                 ArrayList<Posts>posts=getPosts(result,false);
                 try {
@@ -171,17 +171,18 @@ public class DBManager {
                     return post;
                 }
             }
-            @Override
 
+            @Override
             public void onPostExecute(Posts result) {
+
             }
+
             @Override
             public void onPreExecute(Posts result) {
 
             }
         },downloadComplete);
-        String url="https://triads.herokuapp.com/insert?id="+user.getUser_id()+"&post="+context;
-        networking.execute(url);
+        networking.execute(post);
         return null;
     }
     //Delete Post
@@ -209,6 +210,7 @@ public class DBManager {
     //Update Post
     public static void editPost(Posts post,OnDownloadComplete<Posts> downloadComplete)
     {
+
         Networking<String,Posts> networking=new Networking<>(new InternetActivity<String, Posts>() {
             @Override
             public Posts doInBackground(String... strings) {
@@ -306,6 +308,46 @@ public class DBManager {
             }
         }, downloadComplete);
         String url="https://triads.herokuapp.com/followers?source="+user_id;
+        networking.execute(url);
+    }
+    public static void getUsers(OnDownloadComplete<ArrayList<MyDatabase.User>>downloadComplete)
+    {
+        Networking<String,ArrayList<MyDatabase.User>>networking=new Networking<>(new InternetActivity<String, ArrayList<MyDatabase.User>>() {
+            @Override
+            public ArrayList<MyDatabase.User> doInBackground(String... args) {
+                String url=args[0];
+                String result=Networking.connectionResult(url);
+                ArrayList<MyDatabase.User>users=new ArrayList<>();
+                try{
+                    JSONArray jsonArray=new JSONArray(result);
+                    for(int i=0;i<jsonArray.length();i++)
+                    {
+                        JSONObject item=jsonArray.getJSONObject(i);
+                        String username=item.getString("name");
+                        String user_id=item.getString("user_id");
+                        String password="";
+                        MyDatabase.User user=new MyDatabase.User(user_id,username,password);
+                        users.add(user);
+                    }
+                }
+                catch(Exception e)
+                {
+                    Log.d("error_json",e.getLocalizedMessage());
+                }
+                return users;
+            }
+
+            @Override
+            public void onPostExecute(ArrayList<MyDatabase.User> result) {
+
+            }
+
+            @Override
+            public void onPreExecute(ArrayList<MyDatabase.User> result) {
+
+            }
+        },downloadComplete);
+        String url="https://triads.herokuapp.com/users";
         networking.execute(url);
     }
     public static void addFollower(String source,String target)
