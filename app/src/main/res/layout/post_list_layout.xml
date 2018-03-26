@@ -78,7 +78,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageView
+                <pl.droidsonroids.gif.GifImageView
                     android:id="@+id/post_image"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
@@ -117,7 +117,7 @@
                     android:backgroundTint="@color/colorWhite"
                     android:fontFamily="casual"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/smiley"
+                    android:src="@drawable/like_icon_click"
                     android:text="Like"
                     android:textColor="@color/colorPrimary"
                     android:textStyle="bold" />

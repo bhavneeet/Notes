@@ -16,15 +16,7 @@ public class SearchActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        Intent intent=getIntent();
-        if(intent.getAction().equals(Intent.ACTION_SEARCH))
-        {
-            String query=intent.getStringExtra(SearchManager.QUERY);
-            doSearch(query);
-        }
-        adapter=new PostListAdapter(this,postsList,new MainActivity());
-        ListView listView =findViewById(R.id.searchList);
-        listView.setAdapter(adapter);
+
     }
     public void doSearch(String query)
     {

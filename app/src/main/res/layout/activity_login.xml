@@ -102,6 +102,7 @@
         android:layout_centerHorizontal="true"
         android:fadingEdge="vertical"
         android:visibility="gone"
+
         android:progressDrawable="@drawable/login_progress" />
     </RelativeLayout>
 </ScrollView>

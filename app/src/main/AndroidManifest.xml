@@ -43,25 +43,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".FriendsSuggestions" />
-        <activity
-            android:name=".HomeActivity"
-            android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme.NoActionBar" />
-
-        <receiver
-            android:name=".MyReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
-            </intent-filter>
-        </receiver>
-
         <activity android:name=".SearchActivity" />
         <activity
-            android:name=".Networking"
-            android:label="@string/title_activity_networking"
+            android:name=".MoviesActivity"
+            android:label="@string/title_activity_movies"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".NewsActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

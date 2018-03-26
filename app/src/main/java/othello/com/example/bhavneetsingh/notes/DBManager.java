@@ -21,6 +21,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class DBManager {
     //check connection
     public static boolean checkConnection(SQLiteOpenHelper db_helper,String source,String target)
@@ -71,30 +77,24 @@ public class DBManager {
         }
         return usersArrayList;
     }
-
+    static Retrofit retrofit=new Retrofit.Builder().baseUrl("https://triads.herokuapp.com").addConverterFactory(GsonConverterFactory.create()).build();
+    static UserApi userApi=retrofit.create(UserApi.class);
     //Fetch Post List
-    public static ArrayList<Posts> fetchList(MyDatabase.User user,OnDownloadComplete downloadComplete)
+    public static ArrayList<Posts> fetchList(MyDatabase.User user, int limit, int offset, final OnDownloadComplete<ArrayList<Posts>> downloadComplete)
     {
          final ArrayList<Posts>posts=new ArrayList<>();
-        Networking<String,ArrayList<Posts>> networking=new Networking<>(new InternetActivity<String,ArrayList<Posts>>() {
+        Call<ArrayList<Posts>>call=userApi.fetchPosts(user.getUser_id(),limit,offset,user.getCategory());
+        call.enqueue(new Callback<ArrayList<Posts>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Posts>> call, Response<ArrayList<Posts>> response) {
+                downloadComplete.onDownloadComplete(response.body());
+            }
 
             @Override
-            public ArrayList<Posts> doInBackground(String... strings) {
-                String url=strings[0];
-                String result=Networking.connectionResult(url);
-             return getPosts(result,true);
+            public void onFailure(Call<ArrayList<Posts>> call, Throwable t) {
+                   downloadComplete.onDownloadComplete(null);
             }
-            @Override
-
-            public void onPostExecute(ArrayList<Posts> result) {
-            }
-            @Override
-            public void onPreExecute(ArrayList<Posts> result) {
-
-            }
-        },downloadComplete);
-        String url="https://triads.herokuapp.com/userPosts?id="+user.getUser_id();
-        networking.execute(url);
+        });
         return posts;
     }
     public static ArrayList<Posts> fetchSimilarNotes(SQLiteOpenHelper db_helper, String username)
@@ -116,7 +116,6 @@ public class DBManager {
             String userp=cursor.getString(cursor.getColumnIndex(MyDatabase.User.PASSWORD));
             String useri=cursor.getString(cursor.getColumnIndex(MyDatabase.User.USER_ID));
             Posts posts=new Posts(new MyDatabase.User(useri,usern,userp),content,0);
-            posts.setSmiley_id(smiley);
             posts.setId(id);
             postsArrayList.add(posts);
         }
@@ -142,7 +141,6 @@ public class DBManager {
             String userp=cursor.getString(cursor.getColumnIndex(MyDatabase.User.PASSWORD));
             String useri=cursor.getString(cursor.getColumnIndex(MyDatabase.User.USER_ID));
             Posts posts=new Posts(new MyDatabase.User(useri,usern,userp),content,0);
-            posts.setSmiley_id(smiley);
             posts.setId(id);
             postsArrayList.add(posts);
         }
@@ -152,38 +150,106 @@ public class DBManager {
     //Add Post
     public static Posts addPost(Posts post,OnDownloadComplete<Posts> downloadComplete)
     {
-        Networking<Posts,Posts> networking=new Networking<>(new InternetActivity<Posts,Posts>() {
-
+        String user_id=post.getUser().getUser_id();
+        String url=null;
+        if(post.getImgUrl()!=null)
+            url=post.getImgUrl().toString();
+        Call<Posts>user=userApi.addPost(user_id,post.getContent(),url);
+        user.enqueue(new Callback<Posts>() {
             @Override
-            public Posts doInBackground(Posts... args) {
-                Posts post=args[0];
-                String url="https://triads.herokuapp.com/insert?id="+post.getUser().getUser_id()+"&post="+post.getContent()+"&image="+post.getImgUrl();
-                String result=Networking.connectionResult(url);
-                ArrayList<Posts>posts=getPosts(result,false);
-                try {
-                    post=posts.get(0);
-                }
-                catch (Exception e)
-                {
-
-                }
-                finally {
-                    return post;
-                }
-            }
-
-            @Override
-            public void onPostExecute(Posts result) {
+            public void onResponse(Call<Posts> call, Response<Posts> response) {
 
             }
 
             @Override
-            public void onPreExecute(Posts result) {
+            public void onFailure(Call<Posts> call, Throwable t) {
 
             }
-        },downloadComplete);
-        networking.execute(post);
+        });
         return null;
+    }
+    //Fetching User
+    public static void fetchUser(String user_id, String password, final OnDownloadComplete<MyDatabase.User>downloadComplete, final OnDownloadComplete<Boolean>failed)
+    {
+        Call<MyDatabase.User>user=userApi.getUser(user_id,password);
+        user.enqueue(new Callback<MyDatabase.User>() {
+            @Override
+            public void onResponse(Call<MyDatabase.User> call, Response<MyDatabase.User> response) {
+                downloadComplete.onDownloadComplete(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<MyDatabase.User> call, Throwable t) {
+                failed.onDownloadComplete(false);
+            }
+        });
+    }
+    //deleteFollower
+    public static void deleteFollower(MyDatabase.User current, MyDatabase.User follower, final OnDownloadComplete<Boolean>onDownloadComplete)
+    {
+        Call<Void> call=userApi.deleteFollower(current.getUser_id(),follower.getUser_id());
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                onDownloadComplete.onDownloadComplete(true);
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                onDownloadComplete.onDownloadComplete(false);
+            }
+        });
+
+    }
+    //get User
+    public static void getUserPublic(String user_id, final OnDownloadComplete<MyDatabase.User>onDownloadComplete)
+    {
+        Call<MyDatabase.User>call=userApi.getUserPublic(user_id);
+        call.enqueue(new Callback<MyDatabase.User>() {
+            @Override
+            public void onResponse(Call<MyDatabase.User> call, Response<MyDatabase.User> response) {
+                onDownloadComplete.onDownloadComplete(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<MyDatabase.User> call, Throwable t) {
+
+            }
+        });
+    }
+    //deleteFollower
+    public static void addFollower(MyDatabase.User current, MyDatabase.User follower, final OnDownloadComplete<Boolean>onDownloadComplete)
+    {
+        Call<Void> call=userApi.addFollower(current.getUser_id(),follower.getUser_id());
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                onDownloadComplete.onDownloadComplete(true);
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                onDownloadComplete.onDownloadComplete(false);
+            }
+        });
+    }
+    //Fetching Followers
+    public static ArrayList<MyDatabase.User> fetchFollowers(MyDatabase.User current_user, final OnDownloadComplete<ArrayList<MyDatabase.User>> downloadComplete)
+    {
+        ArrayList<MyDatabase.User>list=new ArrayList<>();
+        Call<ArrayList<MyDatabase.User>>call=userApi.fetchFollowers(current_user.getUser_id());
+        call.enqueue(new Callback<ArrayList<MyDatabase.User>>() {
+            @Override
+            public void onResponse(Call<ArrayList<MyDatabase.User>> call, Response<ArrayList<MyDatabase.User>> response) {
+                downloadComplete.onDownloadComplete(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<MyDatabase.User>> call, Throwable t) {
+
+            }
+        });
+        return list;
     }
     //Delete Post
     public static void delete(long post_id,OnDownloadComplete<Posts>downloadComplete)
@@ -208,30 +274,24 @@ public class DBManager {
         networking.execute(url);
     }
     //Update Post
-    public static void editPost(Posts post,OnDownloadComplete<Posts> downloadComplete)
+    public static void editPost(Posts post, final OnDownloadComplete<Posts> downloadComplete)
     {
+    String url="null";
+    if(post.getImgUrl()!=null)
+        url=post.getImgUrl().toString();
+    Call<Posts> call=userApi.editPost(post.getContent(),post.getId(),post.getSmiley_id(),url);
+    call.enqueue(new Callback<Posts>() {
+        @Override
+        public void onResponse(Call<Posts> call, Response<Posts> response) {
+            downloadComplete.onDownloadComplete(response.body());
+        }
 
-        Networking<String,Posts> networking=new Networking<>(new InternetActivity<String, Posts>() {
-            @Override
-            public Posts doInBackground(String... strings) {
-                String url=strings[0];
-                String result=Networking.connectionResult(url);
-                return  null;
-            }
+        @Override
+        public void onFailure(Call<Posts> call, Throwable t) {
 
-            @Override
-            public void onPostExecute(Posts result) {
-
-            }
-
-            @Override
-            public void onPreExecute(Posts result) {
-
-            }
-        }, downloadComplete);
-        String url="https://triads.herokuapp.com/edit?post_id="+post.getId()+"&context="+post.getContent()+"&smiley="+post.getSmiley_id()+"&image="+post.getImgUrl();
-        networking.execute(url);
-     }
+        }
+    });
+    }
     public static MyDatabase.Comment addComment(SQLiteOpenHelper db_helper,Bundle bundle)
     {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -286,30 +346,6 @@ public class DBManager {
         return !(id==-1);
     }
     //getting followers list
-    public static void getFollowers(String user_id,OnDownloadComplete<HashMap<String,Integer>>downloadComplete)
-    {
-        Networking<String,HashMap<String,Integer>> networking=new Networking<>(new InternetActivity<String,HashMap<String, Integer>>() {
-
-            @Override
-            public HashMap<String, Integer> doInBackground(String... args) {
-                String url=args[0];
-                String result=Networking.connectionResult(url);
-                return  getFollowers(result);
-            }
-
-            @Override
-            public void onPostExecute(HashMap<String, Integer> result) {
-
-            }
-
-            @Override
-            public void onPreExecute(HashMap<String, Integer> result) {
-
-            }
-        }, downloadComplete);
-        String url="https://triads.herokuapp.com/followers?source="+user_id;
-        networking.execute(url);
-    }
     public static void getUsers(OnDownloadComplete<ArrayList<MyDatabase.User>>downloadComplete)
     {
         Networking<String,ArrayList<MyDatabase.User>>networking=new Networking<>(new InternetActivity<String, ArrayList<MyDatabase.User>>() {
@@ -423,37 +459,5 @@ public class DBManager {
 
         }
         return followers;
-    }
-    //Getting Posts
-    public static ArrayList<Posts> getPosts(String result,boolean select)
-    {
-        ArrayList<Posts> postsList =new ArrayList<>();
-        try{
-            JSONArray posts=new JSONArray(result);
-            for(int i=0;i<posts.length();i++)
-            {
-                JSONObject item=posts.getJSONObject(i);
-                String user_name=item.getString("name");
-                String password="";
-                String user_id=item.getString("user_id");
-                String context=item.getString("context");
-                long post_id=item.getLong("post_id");
-                int smiley=item.getInt("smiley");
-                String img=item.getString("image");
-                String url=item.getString("profile_picture");
-                MyDatabase.User user=new MyDatabase.User(user_id,user_name,password);
-                user.setProfilePictureUrl(url);
-                Posts post=new Posts(user,context,post_id);
-                post.setId(post_id);
-                    post.setImgUrl(img);
-                post.setSmiley_id(smiley);
-                postsList.add(post);
-            }
-        }
-        catch(Exception e)
-        {
-            Log.d("error_json",e.getLocalizedMessage());
-        }
-        return  postsList;
     }
 }

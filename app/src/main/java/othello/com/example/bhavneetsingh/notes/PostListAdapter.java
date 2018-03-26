@@ -2,7 +2,10 @@
 package othello.com.example.bhavneetsingh.notes;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -18,23 +21,180 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import pl.droidsonroids.gif.GifImageView;
 
-public class PostListAdapter extends BaseAdapter {
-        public interface OnClickIcon{
-            void onClickIcon(View view,MyDatabase.User user);
-        }
+public class PostListAdapter extends  RecyclerView.Adapter<PostListAdapter.RPostHolder> {
+
+    interface OnClickIcon{
+        void onClickIcon(View v, MyDatabase.User user);
+    }
     private Activity context;
     private ArrayList<Posts> posts;
     private OnClickIcon listener;
     private OnClicks clicksListener;
-    PostListAdapter(Activity context, ArrayList<Posts> posts, OnClickIcon listener)
+    private MyDatabase.User current_user;
+    public PostListAdapter(Activity context, ArrayList<Posts> posts, PostListAdapter.OnClickIcon listener, PostListAdapter.OnClicks clicksListener)
     {
         this.context=context;
-         this.posts=posts;
+        this.posts=posts;
         this.listener=listener;
+        this.clicksListener=clicksListener;
+    }
+
+    public ArrayList<Posts> getPosts() {
+        return posts;
+    }
+
+    @Override
+    public PostListAdapter.RPostHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        LayoutInflater inflater=context.getLayoutInflater();
+        View convertView=inflater.inflate(R.layout.post_list_layout,parent,false);
+        PostListAdapter.RPostHolder holder=new PostListAdapter.RPostHolder(convertView);
+        holder.textView=(TextView)convertView.findViewById(R.id.postListText);
+        holder.imageView=(ImageView)convertView.findViewById(R.id.post_image);
+        holder.profileImage=(ImageView)convertView.findViewById(R.id.profile_image);
+        holder.date=(TextView)convertView.findViewById(R.id.post_date);
+        Button but=(Button)convertView.findViewById(R.id.pop_up_button);
+        final PopupMenu menu=new PopupMenu(context,but);
+        menu.getMenuInflater().inflate(R.menu.pop_up_menu,menu.getMenu());
+        holder.menu=menu;
+        holder.button=but;
+        return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(PostListAdapter.RPostHolder holder, final int position) {
+        View  convertView=holder.itemView;
+        final int p=holder.getAdapterPosition();
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(posts.get(p).getUser().getCategory()=="movie")
+                {/*
+                    String text=posts.get(p).getContent();
+                    String image=posts.get(p).getImgUrl();
+                    Bundle bundle=new Bundle();
+                    bundle.putString(MovieAdapter.Movie.TITLE,text);
+                    bundle.putString(MovieAdapter.Movie.IMAGE,image);
+                    Intent intent=new Intent(context,MoviesActivity.class);
+                    intent.putExtras(bundle);
+                    context.startActivity(intent);*/
+                }
+                else
+                {
+                    Posts post=posts.get(p);
+                    String userId=post.getUser_id();
+                    String user_name=post.getName();
+                    String category=post.getCategory();
+                    Intent intent=new Intent(context,NewsActivity.class);
+                    intent.putExtra(MyDatabase.User.USER_ID,userId);
+                    intent.putExtra(MyDatabase.User.NAME,user_name);
+                    intent.putExtra(MyDatabase.User.CATEGORY,category);
+                    context.startActivity(intent);
+                }
+            }
+        });
+        final int pos=holder.getAdapterPosition();
+        if(posts.get(pos).getUser().getProfilePictureUrl()!=null){
+            Picasso.get().load(posts.get(pos).getUser().getProfilePictureUrl().toString()).resize(640,640).into(holder.profileImage);
+        }
+        if(posts.get(pos).getImgUrl()!=null)
+        {
+            Picasso.get().load(posts.get(pos).getImgUrl().toString()).fit()
+                    .into(holder.imageView);
+        }
+         holder.profileImage.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 listener.onClickIcon(v,posts.get(pos).getUser());
+             }
+         });
+        holder.textView.setText(posts.get(pos).getContent());
+        TextView textView=(TextView)convertView.findViewById(R.id.profile_name);
+        textView.setText(posts.get(pos).getUser().getName());
+        holder.date.setText(posts.get(pos).getDate_edited().substring(0,10));
+        final PopupMenu menu=holder.menu;
+        holder.button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menu.show();
+            }
+        });
+        if(clicksListener!=null)
+        {
+            menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    clicksListener.onClickPopupMenu(item,posts.get(position));
+                    return true;
+                }
+            });
+        }
+        final ImageView icon=holder.profileImage;
+        icon.setClickable(true);
+        icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onClickIcon(v,posts.get(position).getUser());
+            }
+        });
+        final ImageButton button[]=new ImageButton[2];
+        button[0]=(ImageButton)convertView.findViewById(R.id.comment_button);
+        button[1]=(ImageButton) convertView.findViewById(R.id.share_button);
+        final View copy=convertView;
+        final GifImageView like=(GifImageView)convertView.findViewById(R.id.like_button);
+        like.setImageResource(PostFunctions.getSmiley(posts.get(pos).getSmiley_id()));
+        like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clicksListener.onClickLikeButton(copy,like.getId(),posts.get(position));
+            }
+        });
+        for(int i=0;i<2;i++){
+            final int ind=i;
+            button[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    clicksListener.onClickLikeButton(copy,button[ind].getId(),posts.get(position));
+                }
+            });
+        }
+        button[0].setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                clicksListener.onLongClickComment(posts.get(position));
+                return true;
+            }
+        });
+    }
+    @Override
+    public int getItemCount() {
+        return posts.size();
+    }
+
+    public interface OnClicks{
+        void onClickPopupMenu(MenuItem menuItem,Posts posts);
+        void onClickLikeButton(View context,int id,Posts posts);
+        void onLongClickComment(Posts posts);
+    }
+    class RPostHolder extends RecyclerView.ViewHolder{
+
+        TextView textView;
+        ImageView imageView;
+        PopupMenu menu;
+        Button button;
+        ImageView profileImage;
+        TextView date;
+        public RPostHolder(View itemView) {
+            super(itemView);
+        }
 
     }
 
@@ -43,7 +203,7 @@ public class PostListAdapter extends BaseAdapter {
         clicksListener=menuListener;
     }
 
-    @Override
+    /*@Override
     public int getCount() {
         return posts.size();
     }
@@ -81,10 +241,13 @@ public class PostListAdapter extends BaseAdapter {
             holder=(PostHolder)convertView.getTag();
 
         }
-        if(posts.get(pos).getUser().getProfilePicture()!=null)
-            holder.profileImage.setImageBitmap(posts.get(pos).getUser().getProfilePicture());
+        if(posts.get(pos).getUser().getProfilePictureUrl()!=null){
+            Log.d("picasso",posts.get(pos).getImgUrl().toString());
+            Picasso.get().load(posts.get(pos).getUser().getProfilePictureUrl().toString()).into(holder.profileImage);
+            Picasso.get().load(posts.get(pos).getImgUrl().toString()).into(holder.imageView);
+        }
+
         holder.textView.setText(posts.get(pos).getContent());
-        holder.imageView.setImageBitmap(posts.get(pos).getBitmap());
         TextView textView=(TextView)convertView.findViewById(R.id.profile_name);
         textView.setText(posts.get(pos).getUser().getName());
         final PopupMenu menu=holder.menu;
@@ -144,12 +307,7 @@ public class PostListAdapter extends BaseAdapter {
             }
         });
         return convertView;
-    }
-     public interface OnClicks{
-     void onClickPopupMenu(MenuItem menuItem,int pos);
-     void onClickLikeButton(View context,int id,int pos);
-     void onLongClickComment(int pos);
-    }
+    }*/
 }
 class PostHolder{
     TextView textView;

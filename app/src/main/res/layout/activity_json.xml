@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context="othello.com.example.bhavneetsingh.notes.JSONActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -15,22 +16,11 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" >
-            <AutoCompleteTextView
-                android:id="@+id/search_user"
-                android:dropDownWidth="match_parent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:lines="1"
-                android:maxLines="1"
-                android:hint="Search">
-                <requestFocus/>
-            </AutoCompleteTextView>
-        </android.support.v7.widget.Toolbar>
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_home" />
+    <include layout="@layout/content_json" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -38,8 +28,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:background="#ffffff"
-        app:backgroundTint="@android:color/background_light"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        app:srcCompat="@android:drawable/ic_dialog_email" />
 
 </android.support.design.widget.CoordinatorLayout>

@@ -36,8 +36,12 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -68,7 +72,12 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         {
             ((TextView)findViewById(R.id.profile_name)).setText(intent.getStringExtra(MyDatabase.User.NAME));
                     edit=intent.getBooleanExtra("edit",false);
-            String start=intent.getStringExtra("edittext");
+            ImageView image=((ImageView)findViewById(R.id.profile_image));
+            Picasso.get().load(intent.getStringExtra(MyDatabase.User.PROFILE_PICTURE)).into(image);
+            String start=intent.getStringExtra(Posts.KEY_CONTEXT);
+            String img=intent.getStringExtra(Posts.IMAGE);
+            ImageView post_image=(ImageView)findViewById(R.id.postImage);
+            Picasso.get().load(img).resize(512,512).into(post_image);
             editText.setText(start);
         }
         builder=new AlertDialog.Builder(this);
@@ -95,15 +104,18 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent=new Intent();
         {
             String text=editText.getText().toString();
-            intent.putExtra(MyDatabase.KEY_CONTEXT,text);
-            intent.putExtra(MyDatabase.KEY_SMILEY,R.drawable.smiley);
-            intent.putExtra(IMAGE,img);
+            intent.putExtra(Posts.KEY_CONTEXT,text);
+            intent.putExtra(Posts.IMAGE,img);
+            intent.putExtra(Posts.KEY_SMILEY,"happy");
+
         }
         if(edit)
         {
           Intent get=getIntent();
-          int position=get.getIntExtra("position",-1);
-          intent.putExtra("position",position);
+          long post_id=get.getLongExtra(Posts.KEY_ID,0);
+          String smiley=get.getStringExtra(Posts.KEY_SMILEY);
+            intent.putExtra(Posts.KEY_SMILEY,smiley);
+          intent.putExtra(Posts.KEY_ID,post_id);
           setResult(MainActivity.EDITPOST,intent);
         }
         else
@@ -174,18 +186,14 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         }
         catch (Exception e)
         {
-            img=null;
+            try{
+                URL imgUrl=new URL(img);
+            }
+            catch (MalformedURLException e1)
+            {
+                img=null;
+            }
         }
-    }
-    public static AlertDialog dialogBuilder(Context context)
-    {
-        AlertDialog dialog;
-        AlertDialog.Builder builder=new AlertDialog.Builder(context);
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View convertView = inflater.inflate(R.layout.background_select, null);
-        builder.setView(convertView);
-        dialog = builder.create();
-        return dialog;
     }
     //open Dialog
     public void openDialog()
@@ -193,8 +201,10 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
         View convertView=null;
         if(dialog==null)
         {
-            dialog=dialogBuilder(this);
-            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.background_select, null);
+            builder.setView(convertView);
+            dialog = builder.create();       dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
                 }
@@ -210,7 +220,7 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
                         try{
 
                             URL img=new URL(url);
-                            loadImage(img);
+                            Picasso.get().load(img.toString()).into((ImageView)findViewById(R.id.postImage));
                         }
                         catch (Exception e)
                         {
@@ -242,58 +252,6 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
 
             imageView.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
-        }
-    }
-    public void loadImage(URL imgUrl)
-    {
-        switchBar(true);
-        Networking<URL,Bitmap>networking=new Networking<>(new InternetActivity<URL, Bitmap>() {
-            @Override
-            public Bitmap doInBackground(URL... args) {
-                Bitmap bitmap=null;
-                try{
-                    URL url=args[0];
-                    {
-                        HttpURLConnection httpURLConnection=(HttpURLConnection)url.openConnection();
-                        httpURLConnection.setRequestMethod("GET");
-                        InputStream in=httpURLConnection.getInputStream();
-                        bitmap= BitmapFactory.decodeStream(in);
-
-                    }
-                }
-                catch (Exception e)
-                {
-                    bitmap=null;
-                }
-                finally {
-                    return bitmap;
-                }
-            }
-
-            @Override
-            public void onPostExecute(Bitmap result) {
-
-            }
-
-            @Override
-            public void onPreExecute(Bitmap result) {
-
-            }
-        }, new OnDownloadComplete<Bitmap>() {
-
-            @Override
-            public void onDownloadComplete(Bitmap result) {
-             ImageView imageView=findViewById(R.id.postImage);
-             imageView.setImageBitmap(result);
-                switchBar(false);
-            }
-        });
-        try{
-            networking.execute(imgUrl);
-        }
-        catch(Exception e)
-        {
-            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

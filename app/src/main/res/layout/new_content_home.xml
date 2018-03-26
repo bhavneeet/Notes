@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/content_home"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/app_bar_home">
-    <ProgressBar
-        android:indeterminateTint="@color/colorPrimary"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:visibility="gone"
-        android:layout_gravity="center"
-        android:id="@+id/progressBar"/>
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/allPosts"
         android:layout_width="match_parent"
@@ -21,5 +14,14 @@
         android:padding="5dp"
         android:orientation="horizontal"
         android:scrollbars="none"/>
-</FrameLayout>
+
+<android.support.design.widget.FloatingActionButton
+    android:layout_width="48dp"
+    android:layout_height="48dp"
+    android:layout_gravity="top|left"
+    android:id="@+id/refresh_icon"
+    android:scaleType="center"
+    android:src="@drawable/refresh_icon"
+    android:backgroundTint="#fff"/>
+</android.support.design.widget.CoordinatorLayout>
 

@@ -8,6 +8,7 @@ import android.util.Pair;
 import android.widget.GridLayout;
 
 import java.net.URL;
+import java.util.ArrayList;
 
 
 public class MyDatabase extends SQLiteOpenHelper {
@@ -96,18 +97,57 @@ public class MyDatabase extends SQLiteOpenHelper {
             this.expense_id = expense_id;
         }
     }
-    static class User{
-        public static final String NAME="NAME",PASSWORD="PASSWORD",USER_ID="USER_ID",TABLE="USER",PROFILE_PICTURE="imgurl";
-        private String name,password,user_id;
-        private URL profilePictureUrl=null;
+    public static class User{
+        public static final String NAME="NAME",PASSWORD="PASSWORD",USER_ID="USER_ID",TABLE="USER",PROFILE_PICTURE="imgurl",CATEGORY="category";
+        private String name;
+        private String password;
+        private String user_id;
+        private String category;
+
+        public String getCategory() {
+            return category;
+        }
+
+        public void setCategory(String category) {
+            this.category = category;
+        }
+
+        private String mobile_no;
+        private String city;
+        private URL profile_picture=null;
         private Bitmap profilePicture=null;
+        private boolean currentFollowing;
+
+        public boolean isCurrentFollowing() {
+            return currentFollowing;
+        }
+
+        public void setCurrentFollowing(boolean currentFollowing) {
+            this.currentFollowing = currentFollowing;
+        }
+
+        public  User()
+        {
+
+        }
+        public String toString()
+        {
+            return name;
+        }
+        public User(String name, String password, String user_id, String mobile_no, String city, URL profile_picture) {
+            this.name = name;
+            this.password = password;
+            this.user_id = user_id;
+            this.mobile_no = mobile_no;
+            this.city = city;
+            this.profile_picture = profile_picture;
+        }
 
         public User(String user_id, String name, String password) {
             this.name = name;
             this.password = password;
             this.user_id = user_id;
         }
-
         public String getName() {
             return name;
         }
@@ -124,21 +164,21 @@ public class MyDatabase extends SQLiteOpenHelper {
             this.password = password;
         }
 
-        public URL getProfilePictureUrl() {
-            return profilePictureUrl;
+        public String getProfilePictureUrl() {
+            String url="null";
+            if(profile_picture!=null)
+                url=profile_picture.toString();
+            return url;
         }
 
         public void setProfilePictureUrl(String profilePictureUrl) {
             try{
 
-                this.profilePictureUrl = new URL(profilePictureUrl);
-                String host=this.profilePictureUrl.getHost();
-                if(!host.equals("scontent-bom1-1.xx.fbcdn.net"))
-                    throw new Exception("Profile picture must br from facebook");
+                this.profile_picture = new URL(profilePictureUrl);
             }
             catch(Exception e)
             {
-                this.profilePictureUrl=null;
+                this.profile_picture=null;
             }
         }
 
@@ -152,9 +192,7 @@ public class MyDatabase extends SQLiteOpenHelper {
 
         public String getUser_id() {
             return user_id;
-
         }
-
         public void setUser_id(String user_id) {
             this.user_id = user_id;
         }

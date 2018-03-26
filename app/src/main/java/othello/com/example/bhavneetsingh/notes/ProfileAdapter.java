@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -27,7 +29,7 @@ public class ProfileAdapter extends BaseAdapter {
     {
         this.context=context;
         this.iconArrayList=icons;
-        this.listener=listener;
+       this.listener=listener;
         this.current=current;
     }
     @Override
@@ -54,7 +56,7 @@ public class ProfileAdapter extends BaseAdapter {
             convertView=inflater.inflate(R.layout.share_follow_list,parent,false);
             holder.imageView=(CircleImageView)convertView.findViewById(R.id.circleImageView);
             holder.textView=(TextView)convertView.findViewById(R.id.textView10);
-            holder.button=(Button)convertView.findViewById(R.id.follow_button);
+            holder.followme=(CircleImageView)convertView.findViewById(R.id.followme);
             convertView.setTag(holder);
         }
         else
@@ -62,30 +64,23 @@ public class ProfileAdapter extends BaseAdapter {
             holder=(ProfileHolder)convertView.getTag();
         }
         holder.textView.setText(iconArrayList.get(position).getName());
-        final Button button=holder.button;
-        {
-            MyDatabase db_helper=MyDatabase.getInstance(context);
-            boolean check=DBManager.checkConnection(db_helper,current.getUser_id(),iconArrayList.get(position).getUser_id());
-            button.setTag(check);
-            if(check)
-                button.setText("Unfollow");
-            else
-                button.setText("Follow");
-        }
-        holder.button.setOnClickListener(new View.OnClickListener() {
+        Picasso.get().load(iconArrayList.get(position).getProfilePictureUrl()).into(holder.imageView);
+        holder.followme.setClickable(true);
+        holder.followme.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onClickFollowButton(button,position);
+                listener.onClickFollowButton(v,current,iconArrayList.get(position));
             }
         });
         return convertView;
     }
     public interface FollowListener{
-        public void onClickFollowButton(Button button,int pos);
+         void onClickFollowButton(View v, MyDatabase.User current_user, MyDatabase.User follower);
     }
     class ProfileHolder{
     CircleImageView imageView;
     TextView textView;
-    Button button;
+    CircleImageView followme;
+
     }
 }

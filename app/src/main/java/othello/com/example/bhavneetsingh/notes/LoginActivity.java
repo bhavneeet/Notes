@@ -14,16 +14,19 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener,LoginInterface{
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
 
     TextView signin;
     TextView register;
@@ -56,12 +59,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void alreadyLogin()
     {
         sharedPreferences=getSharedPreferences(LOGIN,MODE_PRIVATE);
-        String userid=sharedPreferences.getString(LOGIN,NULL);
+        String userid=sharedPreferences.getString(MyDatabase.User.USER_ID,NULL);
         Intent intent=getIntent();
         if(!userid.equals(NULL))
         {
             Intent intent1=new Intent(this,MainActivity.class);
             intent1.putExtra(MyDatabase.User.USER_ID,userid);
+            intent1.putExtra(MyDatabase.User.NAME,sharedPreferences.getString(MyDatabase.User.NAME,""));
+            intent1.putExtra(MyDatabase.User.PROFILE_PICTURE,sharedPreferences.getString(MyDatabase.User.PROFILE_PICTURE,""));
             intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent1);
         }
@@ -102,7 +107,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Bundle bundle=signInbundle();
                 if(bundle==null)
                     return;
-                checkLogin(bundle);
+                login(bundle);
             }
         }
         //regiseration
@@ -125,7 +130,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 if(check)
                 {
                     Toast.makeText(this, "Created", Toast.LENGTH_SHORT).show();
-                  register(bundle);
                 }
                 else
                 {
@@ -134,20 +138,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             }
         }
     }
-    public boolean createAccount()
-    {
-        return false;
-    }
-    public boolean checkSignin()
-    {
-        return false;
-    }
-    //start main activity
+    public static final String IMAGE="profile_pic";
     public void startMain(Bundle bundle)
     {
 
         SharedPreferences.Editor editor=sharedPreferences.edit();
-        editor.putString(LOGIN,bundle.getString(MyDatabase.User.USER_ID));
+        editor.putString(MyDatabase.User.USER_ID,bundle.getString(MyDatabase.User.USER_ID));
+        editor.putString(MyDatabase.User.NAME,bundle.getString(MyDatabase.User.NAME));
+        editor.putString(MyDatabase.User.PROFILE_PICTURE,bundle.getString(MyDatabase.User.PROFILE_PICTURE));
         editor.commit();
         Intent intent=new Intent(this,MainActivity.class);
         intent.putExtras(bundle);
@@ -245,7 +243,70 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         return true;
     }
-    public void checkLogin(Bundle bundle)
+    public void login(final Bundle bundle) {
+        switchBars(true);
+        DBManager.fetchUser(bundle.getString(MyDatabase.User.USER_ID), bundle.getString(MyDatabase.User.PASSWORD), new OnDownloadComplete<MyDatabase.User>() {
+            @Override
+            public void onDownloadComplete(MyDatabase.User result) {
+                Bundle bundle1 = new Bundle();
+                bundle1.putString(MyDatabase.User.NAME, result.getName());
+                bundle1.putString(MyDatabase.User.USER_ID, result.getUser_id());
+                String url = null;
+                if (result.getProfilePictureUrl() != null)
+                    url = result.getProfilePictureUrl().toString();
+                bundle1.putString(MyDatabase.User.PROFILE_PICTURE, url);
+                switchBars(false);
+                startMain(bundle1);
+            }
+        }, new OnDownloadComplete<Boolean>() {
+            @Override
+            public void onDownloadComplete(Boolean result) {
+                switchBars(false);
+            }
+        });
+    }
+    public void registerUser(Bundle bundle)
+    {
+
+    }
+    public void switchBars(boolean check)
+    {
+        ProgressBar loginBar=findViewById(R.id.loginbar);
+        ProgressBar registerBar=findViewById(R.id.registerbar);
+
+        if(!check)
+        {
+            if(loginBar!=null)
+            {
+                signin=findViewById(R.id.sign_in);
+                signin.setVisibility(View.VISIBLE);
+                loginBar.setVisibility(View.INVISIBLE);
+            }
+            else if(registerBar!=null)
+            {
+                register=findViewById(R.id.register);
+                register.setVisibility(View.VISIBLE);
+                registerBar.setVisibility(View.INVISIBLE);
+            }
+        }
+        else
+        {
+            if(loginBar!=null)
+            {
+                signin=findViewById(R.id.sign_in);
+                signin.setVisibility(View.INVISIBLE);
+                loginBar.setVisibility(View.VISIBLE);
+            }
+            else if(registerBar!=null)
+            {
+                register=findViewById(R.id.register);
+                register.setVisibility(View.INVISIBLE);
+                registerBar.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    /*public void checkLogin(Bundle bundle)
     {
 
 
@@ -278,9 +339,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         LoginNetworking networking=new LoginNetworking(this);
         networking.execute("register",urlLink);
     }
-/**
- * When result from url is obtained
- */
+    *//**
+     * When result from url is obtained
+     *//*
     @Override
     public void onPostExecute(Bundle result) {
         boolean check=result.getBoolean("result");
@@ -299,26 +360,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             register.setVisibility(View.VISIBLE);
             registerBar.setVisibility(View.GONE);
         }
-        if(!check)
-      {
-          Toast.makeText(this, "Authentication Failed!", Toast.LENGTH_SHORT).show();
-          return;
-      }
-      DBManager.addUser(mydb,new MyDatabase.User(result.getString(MyDatabase.User.USER_ID),result.getString(MyDatabase.User.NAME) , result.getString(MyDatabase.User.PASSWORD)));
-      startMain(result);
+        DBManager.addUser(mydb,new MyDatabase.User(result.getString(MyDatabase.User.USER_ID),result.getString(MyDatabase.User.NAME) , result.getString(MyDatabase.User.PASSWORD)));
+        startMain(result);*/
+
     }
-}
 class PasswordException extends RuntimeException{
     PasswordException(String msg)
     {
         super(msg);
     }
 }
+/*
 class LoginNetworking extends AsyncTask<String,Void,Bundle> {
 
     private LoginInterface loginInterface;
     public LoginNetworking( LoginInterface loginInterface) {
-     this.loginInterface=loginInterface;
+        this.loginInterface=loginInterface;
     }
 
     @Override
@@ -358,7 +415,7 @@ class LoginNetworking extends AsyncTask<String,Void,Bundle> {
 
         }
         return ans;
-        }
+    }
     protected void onPostExecute(Bundle result)
     {
         super.onPostExecute(result);
@@ -367,5 +424,5 @@ class LoginNetworking extends AsyncTask<String,Void,Bundle> {
 
 }
 interface LoginInterface{
-     void onPostExecute(Bundle result);
-}
+    void onPostExecute(Bundle result);
+}*/
