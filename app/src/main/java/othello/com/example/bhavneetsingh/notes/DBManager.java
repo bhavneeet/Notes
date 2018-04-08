@@ -6,18 +6,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.util.Log;
-import android.webkit.DownloadListener;
-import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Comment;
 
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -79,6 +73,72 @@ public class DBManager {
     }
     static Retrofit retrofit=new Retrofit.Builder().baseUrl("https://triads.herokuapp.com").addConverterFactory(GsonConverterFactory.create()).build();
     static UserApi userApi=retrofit.create(UserApi.class);
+    //public void fetchNews
+    public static void fetchNews(MyDatabase.User user, final OnDownloadComplete<ArrayList<News>> downloadComplete)
+    {
+        Call<ArrayList<News>>call=userApi.fetchNews(user.getUser_id());
+        call.enqueue(new Callback<ArrayList<News>>() {
+            @Override
+            public void onResponse(Call<ArrayList<News>> call, Response<ArrayList<News>> response) {
+                downloadComplete.onDownloadComplete(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<News>> call, Throwable t) {
+                downloadComplete.onDownloadComplete(null);
+            }
+        });
+    }
+    //Fetch Casts
+    public static void fetchCast(String id, final OnDownloadComplete<ArrayList<Cast>>downloadComplete)
+    {
+        Call<ArrayList<Cast>> call=userApi.fetchCast(id);
+        call.enqueue(new Callback<ArrayList<Cast>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Cast>> call, Response<ArrayList<Cast>> response) {
+                downloadComplete.onDownloadComplete(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Cast>> call, Throwable t) {
+                Log.d("season_error",t.getLocalizedMessage());
+                downloadComplete.onDownloadComplete(null);
+            }
+        });
+    }
+    //Fetch Seasons
+    public static void fetchSeasons(String id, final OnDownloadComplete<ArrayList<Season>>downloadComplete)
+    {
+        Call<ArrayList<Season>> call=userApi.fetchSeason(id);
+        call.enqueue(new Callback<ArrayList<Season>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Season>> call, Response<ArrayList<Season>> response) {
+                downloadComplete.onDownloadComplete(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Season>> call, Throwable t) {
+                Log.d("season_error",t.getLocalizedMessage());
+            downloadComplete.onDownloadComplete(null);
+            }
+        });
+    }
+    //fetching movies
+    public static void fetchMovies(MyDatabase.User user, final OnDownloadComplete<ArrayList<Movie>>downloadComplete)
+    {
+        Call<ArrayList<Movie>>call=userApi.fetchMovies(user.getUser_id());
+        call.enqueue(new Callback<ArrayList<Movie>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Movie>> call, Response<ArrayList<Movie>> response) {
+                downloadComplete.onDownloadComplete(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Movie>> call, Throwable t) {
+            downloadComplete.onDownloadComplete(null);
+            }
+        });
+    }
     //Fetch Post List
     public static ArrayList<Posts> fetchList(MyDatabase.User user, int limit, int offset, final OnDownloadComplete<ArrayList<Posts>> downloadComplete)
     {
@@ -96,6 +156,21 @@ public class DBManager {
             }
         });
         return posts;
+    }
+    public static void fetchLocations(final OnDownloadComplete<ArrayList<UserLocation>>downloadComplete)
+    {
+        Call<ArrayList<UserLocation>>call=userApi.fetchLocation();
+        call.enqueue(new Callback<ArrayList<UserLocation>>() {
+            @Override
+            public void onResponse(Call<ArrayList<UserLocation>> call, Response<ArrayList<UserLocation>> response) {
+                downloadComplete.onDownloadComplete(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<UserLocation>> call, Throwable t) {
+               downloadComplete.onDownloadComplete(null);
+            }
+        });
     }
     public static ArrayList<Posts> fetchSimilarNotes(SQLiteOpenHelper db_helper, String username)
     {

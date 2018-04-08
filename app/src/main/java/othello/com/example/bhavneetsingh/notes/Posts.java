@@ -60,6 +60,7 @@ public class Posts {
     }
 
     public String getImage() {
+
         return image;
     }
 

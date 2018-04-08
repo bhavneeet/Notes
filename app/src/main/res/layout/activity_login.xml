@@ -12,6 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+     <com.facebook.login.widget.LoginButton
+         android:id="@+id/login_facebook"
+         android:layout_width="400dp"
+         android:layout_height="400dp"
+         android:layout_below="@+id/sign_in"
+         android:layout_centerHorizontal="true"
+         android:layout_gravity="center_horizontal"
+         android:layout_marginTop="36dp" />
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
@@ -26,6 +34,15 @@
             android:textSize="@dimen/signheading"
             android:textStyle="bold" />
 
+     <Button
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignStart="@+id/textView2"
+         android:layout_below="@+id/login_facebook"
+         android:layout_marginStart="27dp"
+         android:layout_marginTop="8dp"
+         android:id="@+id/logout"
+         android:text="Logout" />
      <EditText
          android:id="@+id/username"
          style="@style/button"
@@ -69,32 +86,7 @@
             android:gravity="center"
             android:text="Sign-In" />
 
-        <TextView
-            android:id="@+id/register1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignEnd="@+id/textView2"
-            android:layout_below="@+id/sign_in"
-            android:layout_marginTop="31dp"
-            android:text="Register"
-            android:textColor="@color/colorWhite"
-            android:textSize="20sp"
-            android:textStyle="italic" />
-
-        <TextView
-            android:id="@+id/forgot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/register1"
-            android:layout_alignBottom="@+id/register1"
-            android:layout_marginEnd="15dp"
-            android:layout_toStartOf="@+id/register1"
-            android:text="Password?"
-            android:textColor="@color/colorWhite"
-            android:textSize="20sp"
-            android:textStyle="italic" />
-
-    <ProgressBar
+     <ProgressBar
         android:id="@+id/loginbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -106,7 +106,7 @@ public class PostFunctions implements PostListAdapter.OnClickIcon,PostListAdapte
         }*/
         if(menuItem.getItemId() == R.id.editMenuItem) {
 
-
+/*
           Intent intent = new Intent(context, PostActivity.class);
             intent.putExtra(MyDatabase.User.NAME,posts.getUser().getName());
             String text = posts.getContent();
@@ -119,7 +119,7 @@ public class PostFunctions implements PostListAdapter.OnClickIcon,PostListAdapte
             intent.putExtra(Posts.IMAGE,img);
             intent.putExtra(MyDatabase.User.PROFILE_PICTURE,posts.getUser().getProfilePictureUrl().toString());
             intent.putExtra(Posts.KEY_ID,posts.getId());
-            context.startActivityForResult(intent, EDITPOST);
+            context.startActivityForResult(intent, EDITPOST);*/
         }
         else if(menuItem.getItemId()==R.id.deleteMenuItem)
         {

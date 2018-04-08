@@ -5,7 +5,9 @@
     <color name="colorAccent">#c6b5d6</color>
     <color name="colorWhite">#ffffff</color>
     <color name="button">#467032</color>
-    <color name="background_material_light">#de5959</color>
     <color name="redTransparent">#64000000</color>
     <color name="follow">#64ffffff</color>
+    <color name="colorBlack">#000000</color>
+    <color name="movie_background">#5e5252</color>
+    <color name="colorWhiteTransparent">#96ffffff</color>
 </resources>

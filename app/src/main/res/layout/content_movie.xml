@@ -5,26 +5,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/activity_movie">
+    >
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="5dp"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#5e5252"
+    >
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/image_dimen"
+        android:id="@+id/movie_poster"/>
     <include layout="@layout/description_layout"
         android:id="@+id/description_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp" />
     <include layout="@layout/items_list_layout"
-        android:id="@+id/cast_list"
+        android:id="@+id/seasons_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp" />
     <include layout="@layout/items_list_layout"
-        android:id="@+id/seasons_list"
+        android:id="@+id/cast_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp" />

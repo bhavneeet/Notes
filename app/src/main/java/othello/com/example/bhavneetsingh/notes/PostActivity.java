@@ -35,6 +35,7 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.squareup.picasso.Picasso;
 
@@ -62,10 +63,11 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
     private android.app.AlertDialog dialog = null;
     private String img;
     FloatingActionButton[]icons;
+    android.support.v7.widget.Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_post_new);
+        setContentView(R.layout.main_post);
         editText=(EditText)findViewById(R.id.postText);
         Intent intent =getIntent();
         if(intent!=null)
@@ -80,6 +82,8 @@ public class PostActivity extends AppCompatActivity implements View.OnClickListe
             Picasso.get().load(img).resize(512,512).into(post_image);
             editText.setText(start);
         }
+        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         builder=new AlertDialog.Builder(this);
         icons=new FloatingActionButton[3];
         icons[0]=(FloatingActionButton)findViewById(R.id.edit_icon);

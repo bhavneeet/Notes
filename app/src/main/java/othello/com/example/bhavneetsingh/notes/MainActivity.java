@@ -1,6 +1,7 @@
 package othello.com.example.bhavneetsingh.notes;
 
 import android.animation.LayoutTransition;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.LauncherActivity;
 import android.app.Notification;
@@ -27,11 +28,16 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.Telephony;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -95,52 +101,45 @@ import pl.droidsonroids.gif.GifImageView;
 import static othello.com.example.bhavneetsingh.notes.LoginActivity.LOGIN;
 import static othello.com.example.bhavneetsingh.notes.LoginActivity.NULL;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity {
 
     private static int id = 3;
     public static final int MAINACTIVITY = 1;
-    private final ArrayList<ArrayList<Posts>> postList= new ArrayList<>();;
+    private final ArrayList<Posts> postList= new ArrayList<>();;
     private RecyclerView list;
     private EditText editText;
     //for Profile Photo
     PopupWindow profilePic;
     private MyDatabase db_helper;//My Databse
     private Bundle user_bundle;
-    private DrawerLayout drawer;
     private ProgressBar bar;
     private static MyDatabase.User current_user;
-    private RecyclerViewAdapter adapter;
-    private final HashMap<MyDatabase.User,Integer>followers=new HashMap<>();
+    private UserListAdapter adapter;
+    private final ArrayList<MyDatabase.User>followers=new ArrayList<>();
     private final ArrayList<MyDatabase.User>users=new ArrayList<>();
     private SwipeRefreshLayout refreshIcon;
     private PostsDatabase postsDatabase;
-
+    @SuppressLint("MissingSuperCall")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+    protected final void onCreate(Bundle savedInstanceState) {
+        login();
+        super.onCreate(savedInstanceState,R.layout.activity_home,current_user);
         //Setting progressbar
         // Get the intent, verify the action and get the query
+
         Intent intent1 = getIntent();
+/*
         if (Intent.ACTION_SEARCH.equals(intent1.getAction())) {
             String query = intent1.getStringExtra(SearchManager.QUERY);
             Toast.makeText(this, query, Toast.LENGTH_SHORT).show();
         }
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        this.drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
+*/
+/*
         db_helper =  MyDatabase.getInstance(this);
+*/
         Intent intent=getIntent();
         //Getting user profile from login activity
-        login();
+
         refreshIcon=(SwipeRefreshLayout)findViewById(R.id.refresh_layout);
         refreshIcon.setColorSchemeColors(getResources().getColor(android.R.color.holo_blue_bright),
                 getResources().getColor(android.R.color.holo_green_dark),
@@ -150,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //Following maps
          //Getting users
-         final AutoCompleteTextView search=toolbar.findViewById(R.id.search_user);
+         /*final AutoCompleteTextView search=toolbar.findViewById(R.id.search_user);
          final TemplateAdapter<MyDatabase.User>arrayAdapter=new TemplateAdapter<>(users, this, new TemplateAdapter.InitAdapter<MyDatabase.User>() {
              @Override
              public View getView(final int position, View convertView, ViewGroup parent, final ArrayList<MyDatabase.User> users) {
@@ -180,17 +179,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 arrayAdapter.notifyDataSetChanged();
                 search.getAdapter();
             }
-        });
+        });*/
         //
-        TextView header_name=(TextView)navigationView.getHeaderView(0).findViewById(R.id.navigation_header);
-        header_name.setText(current_user.getName());
-        TextView header_id=(TextView)navigationView.getHeaderView(0).findViewById(R.id.navigation_id);
-        header_id.setText(current_user.getUser_id());
-        ImageView profile_image=(ImageView)navigationView.getHeaderView(0).findViewById(R.id.navigation_image);
-        if(current_user.getProfilePictureUrl()!=null)
-        {
-            Picasso.get().load(current_user.getProfilePictureUrl().toString()).resize(128,128).into(profile_image);
-        }
         //For Welcoming Toast
         Toast.makeText(this, "Welcome", Toast.LENGTH_SHORT).show();
         editText = (EditText) findViewById(R.id.postText);
@@ -206,11 +196,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //Initializing Popup menu
         profilePic=new PopupWindow(this);
         refresh();
+
     }
     public void initList()
     {
-        adapter = new RecyclerViewAdapter(this,postList );
         list = (RecyclerView) findViewById(R.id.allPosts);
+        UserFunctions postFunctions=new UserFunctions(this,list);
+        adapter = new UserListAdapter(this,followers, postFunctions,postFunctions);
         LinearLayoutManager layoutManager=new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         list.setLayoutManager(layoutManager);
@@ -224,41 +216,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if(result!=null)
             {
                 followers.clear();
-                for(MyDatabase.User user:result)
-                    followers.put(user,1);
-                followers.put(current_user,1);
-                postList.clear();
+                followers.addAll(result);
                 adapter.notifyDataSetChanged();
-                for(MyDatabase.User key:followers.keySet())
-                {
-                    DBManager.fetchList(key, 1, 0, new OnDownloadComplete<ArrayList<Posts>>() {
-                                @Override
-                                public void onDownloadComplete(ArrayList<Posts> result) {
-                                    if(result!=null)
-                                    {
-                                        if(result.size()>0)
-                                        {
-      /*                                      postsDatabase.getPostsDOE().deletePosts(result.get(0).getUser().getUser_id());
-                                            postsDatabase.getPostsDOE().insertPosts(result);
-      */                                      postList.add(result);
-                                            Log.d("movies",postList.size()+"");
-                                            adapter.notifyDataSetChanged();
-                                        }
-                                        switcBars(false);
-                                        refreshIcon.setRefreshing(false);
-                                    }
-                                }
-                            }
-                    );
-                }
+                refreshIcon.setRefreshing(false);
             }
-            else {
-
-
-            }
-            }
-
-        });}
+              }
+               }
+            );
+    }
     //storing followerlist
     //login
     public void login()
@@ -303,34 +268,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return current_user;
     }
     @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            Intent intent=new Intent(this,FriendsSuggestions.class);
-            intent.putExtra(MyDatabase.User.USER_ID,current_user.getUser_id());
-            startActivity(intent);
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-            logOut();
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
     //Logging out
-    public void logOut()
+   /* public void logOut()
     {
         SharedPreferences sharedPreferences=getSharedPreferences(LoginActivity.LOGIN,MODE_PRIVATE);
         SharedPreferences.Editor editor=sharedPreferences.edit();
@@ -341,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         intent.putExtra(LoginActivity.LOGOUT,true);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-    }
+    }*/
     //Showing Popup for Following
     private void showFollowPopup()
     {
@@ -358,17 +298,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static int getClassId() {
         return ++id;
     }
-
+    private android.support.v7.widget.SearchView searchView;
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.create_post_menu, menu);
+        inflater.inflate(R.menu.home, menu);
+        MenuItem searchItem=menu.findItem(R.id.action_search);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView= (android.support.v7.widget.SearchView) searchItem.getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(true);
+        searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return true;
+            }
+        });
         return true;
     }
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==R.id.sugestions)
-        {
-            showFollowPopup();
-        }
+
         return true;
     }
     //Switching progressbar and list
@@ -390,7 +344,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //Refreshing
     private void refresh()
     {
-         refreshIcon=(SwipeRefreshLayout)findViewById(R.id.refresh_layout);
          refreshIcon.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
              @Override
              public void onRefresh() {
@@ -467,13 +420,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             View v=((ImageView)convertView.findViewById(R.id.follow));
             if(!current_user.getUser_id().equals(user.getUser_id()))
             {
-                if(followers.containsKey(user.getUser_id()))
+     /*           if(followers.containsKey(user.getUser_id()))
                 {
                     v.setAlpha((float)1);
                 }
                 else {
                     v.setAlpha((float) 0.5);
-                }
+                }*/
             }
             else
             {
@@ -512,7 +465,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void follow(View v, MyDatabase.User user)
     {
         String user_id=user.getUser_id();
-        if(!current_user.getUser_id().equals(user_id))
+        /*if(!current_user.getUser_id().equals(user_id))
 
         {
             if(followers.containsKey(user))
@@ -525,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             followers.put(user,1);
             v.setAlpha((float)0.5);
             DBManager.addFollower(current_user.getUser_id(),user_id);
-        }}
+        }}*/
     }
     /*//When menuitem of tList.get(pos).getUser().getUser_id().equals(current_user.getUser_id()))
         {

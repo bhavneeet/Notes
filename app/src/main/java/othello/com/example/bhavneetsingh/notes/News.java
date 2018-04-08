@@ -2,22 +2,18 @@ package othello.com.example.bhavneetsingh.notes;
 
 
 public class News {
-    String image;
-    String title,content,next_news;
-
-    public News(String image, String title, String content, String next_news) {
-        this.image = image;
+   public static final String URL="newslink";
+    String title,context,image,author,date,url;
+    public News(String title, String context) {
         this.title = title;
-        this.content = content;
-        this.next_news = next_news;
+        this.context = context;
+    }
+    public String getUrl() {
+        return url;
     }
 
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getTitle() {
@@ -28,19 +24,35 @@ public class News {
         this.title = title;
     }
 
-    public String getContent() {
-        return content;
+    public String getContext() {
+        return context;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setContext(String context) {
+        this.context = context;
     }
 
-    public String getNext_news() {
-        return next_news;
+    public String getImage() {
+        return image;
     }
 
-    public void setNext_news(String next_news) {
-        this.next_news = next_news;
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
     }
 }

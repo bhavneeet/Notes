@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@color/colorWhite"
     tools:context="othello.com.example.bhavneetsingh.notes.PostActivity">
 
     <de.hdodenhof.circleimageview.CircleImageView

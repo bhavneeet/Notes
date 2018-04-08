@@ -4,8 +4,10 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:orientation="vertical"
+        android:fitsSystemWindows="true"
         android:layout_height="match_parent"
         android:background="@color/colorWhite"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="othello.com.example.bhavneetsingh.notes.PostActivity">
 
         <include

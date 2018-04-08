@@ -1,4 +1,3 @@
-
 package othello.com.example.bhavneetsingh.notes;
 import android.app.Activity;
 import android.content.Context;
@@ -59,11 +58,10 @@ public class PostListAdapter extends  RecyclerView.Adapter<PostListAdapter.RPost
         holder.imageView=(ImageView)convertView.findViewById(R.id.post_image);
         holder.profileImage=(ImageView)convertView.findViewById(R.id.profile_image);
         holder.date=(TextView)convertView.findViewById(R.id.post_date);
-        Button but=(Button)convertView.findViewById(R.id.pop_up_button);
-        final PopupMenu menu=new PopupMenu(context,but);
+        holder.button=(Button)convertView.findViewById(R.id.pop_up);
+        PopupMenu menu=new PopupMenu(context,holder.button);
         menu.getMenuInflater().inflate(R.menu.pop_up_menu,menu.getMenu());
         holder.menu=menu;
-        holder.button=but;
         return holder;
     }
 
@@ -103,7 +101,7 @@ public class PostListAdapter extends  RecyclerView.Adapter<PostListAdapter.RPost
         if(posts.get(pos).getUser().getProfilePictureUrl()!=null){
             Picasso.get().load(posts.get(pos).getUser().getProfilePictureUrl().toString()).resize(640,640).into(holder.profileImage);
         }
-        if(posts.get(pos).getImgUrl()!=null)
+        if(posts.get(pos).getImgUrl()!=null&&!posts.get(pos).getImgUrl().equals(""))
         {
             Picasso.get().load(posts.get(pos).getImgUrl().toString()).fit()
                     .into(holder.imageView);
@@ -122,7 +120,7 @@ public class PostListAdapter extends  RecyclerView.Adapter<PostListAdapter.RPost
         holder.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                menu.show();
+               menu.show();
             }
         });
         if(clicksListener!=null)
@@ -308,11 +306,4 @@ public class PostListAdapter extends  RecyclerView.Adapter<PostListAdapter.RPost
         });
         return convertView;
     }*/
-}
-class PostHolder{
-    TextView textView;
-    ImageView imageView;
-    PopupMenu menu;
-    Button button;
-    ImageView profileImage;
 }

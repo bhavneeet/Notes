@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface UserApi {
@@ -26,4 +25,14 @@ public interface UserApi {
     Call<Void> deleteFollower(@Query("source")String source,@Query("target")String target);
     @GET("deletefollower")
     Call<Void> addFollower(@Query("source")String source,@Query("target")String target);
+    @GET("userPosts/news")
+    Call<ArrayList<News>> fetchNews(@Query("user_id")String user_id);
+    @GET("userPosts/tvshows")
+    Call<ArrayList<Movie>> fetchMovies(@Query("user_id")String user_id);
+    @GET("/imdb/tvshows/seasons")
+    Call<ArrayList<Season>> fetchSeason(@Query("id") String id);
+    @GET("/imdb/tvshows/cast")
+    Call<ArrayList<Cast>> fetchCast(@Query("user_id")String user_id);
+    @GET("/locations")
+    Call<ArrayList<UserLocation>> fetchLocation();
 }

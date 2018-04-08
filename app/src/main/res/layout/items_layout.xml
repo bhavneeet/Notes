@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="vertical" android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginRight="5dp">
 
     <ImageView
-        android:layout_width="@dimen/image_dimen"
+        android:id="@+id/show_image"
+        android:layout_width="@dimen/image_dimen_width"
         android:layout_height="@dimen/image_dimen"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:id="@+id/movie_image"
-        android:background="@color/colorAccent"/>
+        android:background="@color/colorAccent" />
 
     <TextView
-        android:id="@+id/movie_name"
-        android:layout_width="@dimen/image_dimen"
-        android:layout_height="@dimen/name_dimen"
+        android:id="@+id/show_name"
         style="@style/content"
-        android:background="@android:drawable/screen_background_light_transparent"
-        android:layout_alignBottom="@+id/imageView"
+        android:layout_width="@dimen/image_dimen_width"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/show_image"
         android:layout_alignParentStart="true"
+        android:background="@android:drawable/screen_background_light_transparent"
         android:gravity="center_horizontal"
-        android:text="TextView" />
+        android:text="TextView"
+        android:textSize="24dp" />
 </RelativeLayout>

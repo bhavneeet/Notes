@@ -14,6 +14,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookRequestError;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -24,6 +35,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
@@ -32,25 +44,86 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     TextView register;
     MyDatabase mydb;
     private boolean sign;
+    private static final String EMAIL = "email";
+    CallbackManager callbackManager;
+    LoginButton loginButton;
     public final static String LOGIN="login",NULL="null",LOGOUT="logout";
     private  SharedPreferences sharedPreferences;
     private Bundle current_bundle;
+    private Button logout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        loginButton = (LoginButton) findViewById(R.id.login_facebook);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loginFacebook();
+            }
+        });
         alreadyLogin();
         init();
+        logout=(Button)findViewById(R.id.logout);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logout();
+            }
+        });
+    }
 
+    public void logout()
+    {
+        GraphRequest delPermRequest = new GraphRequest(AccessToken.getCurrentAccessToken(), "/{user-id}/permissions/", null, HttpMethod.DELETE, new GraphRequest.Callback() {
+            @Override
+            public void onCompleted(GraphResponse graphResponse) {
+                if(graphResponse!=null){
+                    FacebookRequestError error =graphResponse.getError();
+                    if(error!=null){
+                        Log.e("Exception", error.toString());
+                    }else {
+                        finish();
+                    }
+                }
+            }
+        });
+        Log.d("Exception","Executing revoke permissions with graph path" + delPermRequest.getGraphPath());
+        delPermRequest.executeAsync();
+        LoginManager.getInstance().logOut();
+    }
+    public void loginFacebook(){
+
+        callbackManager = CallbackManager.Factory.create();
+        loginButton.setReadPermissions(Arrays.asList(EMAIL,"user_status"));
+        // If you are using in a fragment, call loginButton.setFragment(this);
+        // Callback registration
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Toast.makeText(LoginActivity.this, ""+loginResult.getAccessToken(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancel() {
+                // App code
+            }
+
+            @Override
+            public void onError(FacebookException exception) {
+                Toast.makeText(LoginActivity.this, ""+exception.getLocalizedMessage()+"hello", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
     public void init()
     {
         //getting buttons from layout
         signin=(TextView) findViewById(R.id.sign_in);
         signin.setOnClickListener(this);
-        register=(TextView) findViewById(R.id.register1);
+        /*register=(TextView) findViewById(R.id.register1);
         register.setOnClickListener(this);
         //setting current layout to singin layout
+        */
         sign=true;
         //Local database
         mydb=MyDatabase.getInstance(this);
@@ -74,7 +147,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     //chanhging layout
     public void changeLayout()
     {
-        if(sign)
+     /*   if(sign)
         {
             setContentView(R.layout.registrer_layout);
             signin=(TextView) findViewById(R.id.sign_in1);
@@ -87,31 +160,29 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             setContentView(R.layout.activity_login);
             signin=(TextView) findViewById(R.id.sign_in);
             signin.setOnClickListener(this);
-            register=(TextView) findViewById(R.id.register1);
-            register.setOnClickListener(this);
 
-        }
+        }*/
     }
     public void onClick(View view)
     {
         //Sigining in
-        if(view.getId()==signin.getId())
+        /*if(view.getId()==signin.getId())
         {
             if(!sign)
             {
-                changeLayout();
+                chLayout();
                 sign=true;
             }
             else
             {
-                Bundle bundle=signInbundle();
+        */        Bundle bundle=signInbundle();
                 if(bundle==null)
                     return;
                 login(bundle);
-            }
+        /*    }
         }
-        //regiseration
-        else if(view.getId()==register.getId())
+        *///regiseration
+        /*else if(view.getId()==register.getId())
         {
             if(sign)
             {
@@ -136,7 +207,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Toast.makeText(this, "Email id exists", Toast.LENGTH_SHORT).show();
                 }
             }
-        }
+        }*/
     }
     public static final String IMAGE="profile_pic";
     public void startMain(Bundle bundle)

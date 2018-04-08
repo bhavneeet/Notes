@@ -103,6 +103,33 @@ public class MyDatabase extends SQLiteOpenHelper {
         private String password;
         private String user_id;
         private String category;
+        private String status_text;
+        private String status_cover;
+        private boolean liked;
+
+        public boolean isLiked() {
+            return liked;
+        }
+
+        public void setLiked(boolean liked) {
+            this.liked = liked;
+        }
+
+        public String getStatus_text() {
+            return status_text;
+        }
+
+        public void setStatus_text(String status_text) {
+            this.status_text = status_text;
+        }
+
+        public String getStatus_cover() {
+            return status_cover;
+        }
+
+        public void setStatus_cover(String status_cover) {
+            this.status_cover = status_cover;
+        }
 
         public String getCategory() {
             return category;

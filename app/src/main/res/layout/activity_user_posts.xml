@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/holo_red_light"
+    tools:context="othello.com.example.bhavneetsingh.notes.UserPosts">
+  <!-- <include layout="@layout/toolbar_layout"
+       android:id="@+id/include4" />-->
+  <com.wang.avi.AVLoadingIndicatorView
+      android:id="@+id/loading"
+      android:layout_width="100dp"
+      android:layout_height="100dp"
+      android:layout_centerHorizontal="true"
+      android:layout_centerVertical="true"
+      android:layout_gravity="center"
+      app:indicatorName="PacmanIndicator" />
+
+  <android.support.v4.view.ViewPager
+      android:id="@+id/user_posts"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_alignParentStart="true"
+      android:visibility="gone" />
+
+  <include
+      layout="@layout/like_toolbar_layout"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true"
+      android:layout_alignParentStart="true"
+      />
+
+
+</RelativeLayout>

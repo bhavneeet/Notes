@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.AppBarLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:theme="@style/AppTheme.AppBarOverlay"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/like_toolbar"
+        android:layout_width="match_parent"
+        android:alpha="0.5"
+        android:layout_height="?attr/actionBarSize"
+        android:theme="@style/AppTheme.NoActionBar"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
+        <LinearLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/like_border"
+            >
+
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/like_button"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/like_border"
+                android:backgroundTint="@color/colorWhite"
+                android:fontFamily="casual"
+                android:scaleType="fitCenter"
+                android:src="@drawable/like_icon"
+                android:text="Like"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/comment_button"
+                android:layout_width="24dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/like_border"
+                android:backgroundTint="@color/colorWhite"
+                android:fontFamily="casual"
+                android:gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@drawable/comment"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
+
+            <ImageButton
+
+                android:id="@+id/share_button"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/like_border"
+                android:backgroundTint="@color/colorWhite"
+                android:fontFamily="casual"
+                android:gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@drawable/shareit"
+                android:text="Share"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+    </android.support.v7.widget.Toolbar>
+
+</android.support.design.widget.AppBarLayout>
