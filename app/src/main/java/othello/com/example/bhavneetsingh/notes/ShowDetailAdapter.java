@@ -13,16 +13,13 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-/**
- * Created by bhavneet singh on 02-Apr-18.
- */
 
 public class ShowDetailAdapter extends RecyclerView.Adapter<ShowDetailAdapter.ShowDetailHolder>{
 
     public ArrayList<ShowDetail>showDetails;
     public Context context;
 
-    public ShowDetailAdapter(Context context,ArrayList<ShowDetail> showDetails) {
+    public ShowDetailAdapter(Context context, ArrayList<ShowDetail> showDetails) {
         this.showDetails = showDetails;
         this.context = context;
     }
@@ -31,7 +28,7 @@ public class ShowDetailAdapter extends RecyclerView.Adapter<ShowDetailAdapter.Sh
     @Override
     public ShowDetailHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater=(LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View convertView=inflater.inflate(R.layout.items_layout,parent,false);
+        View convertView=inflater.inflate(R.layout.show_detail_layout,parent,false);
         ShowDetailHolder showDetailHolder=new ShowDetailHolder(convertView);
         return showDetailHolder;
     }

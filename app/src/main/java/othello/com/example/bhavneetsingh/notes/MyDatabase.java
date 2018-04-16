@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.util.Pair;
 import android.widget.GridLayout;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -98,14 +100,35 @@ public class MyDatabase extends SQLiteOpenHelper {
         }
     }
     public static class User{
-        public static final String NAME="NAME",PASSWORD="PASSWORD",USER_ID="USER_ID",TABLE="USER",PROFILE_PICTURE="imgurl",CATEGORY="category";
+        public static final String NAME="NAME",PASSWORD="PASSWORD",USER_ID="USER_ID",TABLE="USER",PROFILE_PICTURE="imgurl",CATEGORY="category",LONGITUDE="longitude",LATITUDE="latitude";
         private String name;
         private String password;
         private String user_id;
         private String category;
         private String status_text;
         private String status_cover;
+        private double latitude;
+        private double longitude;
         private boolean liked;
+        public LatLng getPosition()
+        {
+            return new LatLng(latitude,longitude);
+        }
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public void setLatitude(double latitude) {
+            this.latitude = latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
+
+        public void setLongitude(double longitude) {
+            this.longitude = longitude;
+        }
 
         public boolean isLiked() {
             return liked;

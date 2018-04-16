@@ -1,45 +1,60 @@
 package othello.com.example.bhavneetsingh.notes;
-
 import android.content.Context;
-import android.graphics.drawable.Icon;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
-/**
- * Created by bhavneet singh on 20-Feb-18.
- */
-
 public class ProfileAdapter extends BaseAdapter {
-    private ArrayList<MyDatabase.User>iconArrayList;
+    private ArrayList<MyDatabase.User> users;
     private Context context;
     private FollowListener listener;
     MyDatabase.User current;
+    OnItemClick itemClick;
+    HashMap<String,Boolean>followers;
+    public OnItemClick getItemClick() {
+        return itemClick;
+    }
+    public void setItemClick(OnItemClick itemClick) {
+        this.itemClick = itemClick;
+    }
+
+    interface OnItemClick{
+        void onClick(MyDatabase.User user);
+    }
     public ProfileAdapter(Context context, ArrayList<MyDatabase.User>icons, FollowListener listener, MyDatabase.User current)
     {
         this.context=context;
-        this.iconArrayList=icons;
+        this.users =icons;
        this.listener=listener;
         this.current=current;
+        followers=new HashMap<>();
+        }
+
+    public ProfileAdapter(Context context, ArrayList<MyDatabase.User> users, FollowListener listener, MyDatabase.User current, HashMap<String, Boolean> followers) {
+        this.users = users;
+        this.context = context;
+        this.listener = listener;
+        this.current = current;
+        this.itemClick = itemClick;
+        this.followers = followers;
     }
+
     @Override
     public int getCount() {
-        return iconArrayList.size();
+        return users.size();
     }
 
     @Override
     public MyDatabase.User getItem(int position) {
-        return iconArrayList.get(position);
+        return users.get(position);
     }
 
     @Override
@@ -48,8 +63,9 @@ public class ProfileAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-         ProfileHolder holder=new ProfileHolder();
+    public View getView( int pos, View convertView, ViewGroup parent) {
+        final int position=pos;
+        ProfileHolder holder=new ProfileHolder();
         if(convertView==null)
         {
             LayoutInflater inflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -63,19 +79,35 @@ public class ProfileAdapter extends BaseAdapter {
         {
             holder=(ProfileHolder)convertView.getTag();
         }
-        holder.textView.setText(iconArrayList.get(position).getName());
-        Picasso.get().load(iconArrayList.get(position).getProfilePictureUrl()).into(holder.imageView);
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(itemClick!=null)
+                {
+                    itemClick.onClick(users.get(position));
+                }
+            }
+        });
+        if(followers.containsKey(users.get(position).getUser_id()))
+        {
+            holder.followme.setAlpha((float)(0.3));
+        }
+        holder.textView.setText(users.get(position).getName());
+        Picasso.get().load(users.get(position).getProfilePictureUrl()).into(holder.imageView);
         holder.followme.setClickable(true);
         holder.followme.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onClickFollowButton(v,current,iconArrayList.get(position));
+                if(listener!=null)
+                {
+                    listener.onClickFollowButton(v,current.getUser_id(), users.get(position).getUser_id());
+                }
             }
         });
         return convertView;
     }
     public interface FollowListener{
-         void onClickFollowButton(View v, MyDatabase.User current_user, MyDatabase.User follower);
+         void onClickFollowButton(View v, String current_user, String follower);
     }
     class ProfileHolder{
     CircleImageView imageView;

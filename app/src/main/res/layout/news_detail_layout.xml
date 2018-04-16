@@ -34,20 +34,6 @@
                 android:textStyle="bold" />
 
             <ImageButton
-                android:id="@+id/link_button"
-                android:layout_width="24dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/like_border"
-                android:backgroundTint="@color/colorWhite"
-                android:fontFamily="casual"
-                android:gravity="center"
-                android:scaleType="fitCenter"
-                android:src="@drawable/link"
-                android:textColor="@color/colorPrimary"
-                android:textStyle="bold" />
-
-            <ImageButton
 
                 android:id="@+id/share_button"
                 android:layout_width="50dp"
@@ -62,6 +48,21 @@
                 android:text="Share"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/link_button"
+                android:layout_width="24dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/like_border"
+                android:backgroundTint="@color/colorWhite"
+                android:fontFamily="casual"
+                android:gravity="center"
+                android:scaleType="fitCenter"
+                android:src="@drawable/link"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold" />
+
         </LinearLayout>
 
     </android.support.v7.widget.Toolbar>

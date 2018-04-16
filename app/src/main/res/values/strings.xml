@@ -24,4 +24,9 @@
     <string name="fb_login_protocol_scheme">fb1887165001317104</string>
     <string name="title_activity_user_posts">UserPosts</string>
     <string name="title_activity_maps">Map</string>
+
+    <string name="title_activity_video">VideoActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_movie_detail">MovieDetailActivity</string>
 </resources>

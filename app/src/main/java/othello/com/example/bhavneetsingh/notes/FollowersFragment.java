@@ -15,7 +15,7 @@ import android.widget.ProgressBar;
 import java.util.ArrayList;
 
 
-public class FollowersFragment extends Fragment implements ProfileAdapter.FollowListener{
+public class FollowersFragment extends Fragment {
 
     private MyDatabase.User current_user;
     private ArrayList<MyDatabase.User>usersList;
@@ -28,7 +28,7 @@ public class FollowersFragment extends Fragment implements ProfileAdapter.Follow
         super.onAttach(context);
         this.current_user = MainActivity.getCurrentUser();
         usersList=new ArrayList<>();
-        adapter=new ProfileAdapter(context,usersList,this,current_user);
+/*        adapter=new ProfileAdapter(context,usersList,this,current_user);*/
     }
 
 
@@ -57,37 +57,9 @@ public class FollowersFragment extends Fragment implements ProfileAdapter.Follow
         listView.setAdapter(adapter);
         return view;
     }
-    @Override
+
+    /*@Override
     public void onClickFollowButton(View v, MyDatabase.User current_user, MyDatabase.User follower) {
-       if(v.getAlpha()==1)
-       {
-           final MyDatabase.User follow=follower;
-           final View view=v;
-          DBManager.deleteFollower(current_user, follower, new OnDownloadComplete<Boolean>() {
-              @Override
-              public void onDownloadComplete(Boolean result) {
-                  if(result)
-                  {
-                      follow.setCurrentFollowing(false);
-                      view.setAlpha((float)0.5);
-                  }
-              }
-          });
-       }
-       else
-       {
-           final MyDatabase.User follow=follower;
-           final View view=v;
-           DBManager.addFollower(current_user, follower, new OnDownloadComplete<Boolean>() {
-               @Override
-               public void onDownloadComplete(Boolean result) {
-                   if(result)
-                   {
-                       follow.setCurrentFollowing(true);
-                       view.setAlpha((float)1);
-                   }
-               }
-           });
-       }
-    }
+
+    }*/
 }

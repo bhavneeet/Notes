@@ -52,27 +52,42 @@ public class DBManager {
         long id=db.delete(MyDatabase.Graph.TABLE, MyDatabase.Graph.SOURCE+" = ? and "+MyDatabase.Graph.TARGET+" = ?",arr);
         return !(id==-1);
     }
-    //User List
-    public static ArrayList<MyDatabase.User> fetchUserList(SQLiteOpenHelper db_helper, MyDatabase.User user)
-    {
-        ArrayList<MyDatabase.User>usersArrayList=new ArrayList<>();
-        SQLiteDatabase db=db_helper.getReadableDatabase();
-        String query="SELECT * "
-                +"FROM "+MyDatabase.User.TABLE
-                +" WHERE "+MyDatabase.User.USER_ID+" != ?";
 
-        Cursor cursor=db.rawQuery(query,new String[]{user.getUser_id()});
-        while(cursor.moveToNext())
-        {
-            String usern=cursor.getString(cursor.getColumnIndex(MyDatabase.User.NAME));
-            String userp=cursor.getString(cursor.getColumnIndex(MyDatabase.User.PASSWORD));
-            String useri=cursor.getString(cursor.getColumnIndex(MyDatabase.User.USER_ID));
-            usersArrayList.add(new MyDatabase.User(useri,usern,userp));
-        }
-        return usersArrayList;
-    }
     static Retrofit retrofit=new Retrofit.Builder().baseUrl("https://triads.herokuapp.com").addConverterFactory(GsonConverterFactory.create()).build();
     static UserApi userApi=retrofit.create(UserApi.class);
+    //Registeration
+    public static void registerUser(MyDatabase.User user, final OnDownloadComplete<MyDatabase.User>downloadComplete)
+    {
+     Call<MyDatabase.User>call=userApi.registerUser(user.getName(),user.getUser_id(),user.getPassword(),user.getProfilePictureUrl());
+     call.enqueue(new Callback<MyDatabase.User>() {
+         @Override
+         public void onResponse(Call<MyDatabase.User> call, Response<MyDatabase.User> response) {
+          downloadComplete.onDownloadComplete(response.body());
+         }
+         @Override
+         public void onFailure(Call<MyDatabase.User> call, Throwable t) {
+             downloadComplete.onDownloadComplete(null);
+         }
+     });
+    }
+    //Searching User
+    public static void searchUser(String name, final OnDownloadComplete<ArrayList<MyDatabase.User>>downloadComplete)
+    {
+        Call<ArrayList<MyDatabase.User>>call=userApi.searchUser(name);
+        call.enqueue(new Callback<ArrayList<MyDatabase.User>>() {
+            @Override
+            public void onResponse(Call<ArrayList<MyDatabase.User>> call, Response<ArrayList<MyDatabase.User>> response) {
+                downloadComplete.onDownloadComplete(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<MyDatabase.User>> call, Throwable t) {
+
+                Log.d("Search",t.getLocalizedMessage());
+                downloadComplete.onDownloadComplete(null);
+            }
+        });
+    }
     //public void fetchNews
     public static void fetchNews(MyDatabase.User user, final OnDownloadComplete<ArrayList<News>> downloadComplete)
     {
@@ -157,17 +172,17 @@ public class DBManager {
         });
         return posts;
     }
-    public static void fetchLocations(final OnDownloadComplete<ArrayList<UserLocation>>downloadComplete)
+    public static void fetchLocations(final OnDownloadComplete<ArrayList<MyDatabase.User>>downloadComplete)
     {
-        Call<ArrayList<UserLocation>>call=userApi.fetchLocation();
-        call.enqueue(new Callback<ArrayList<UserLocation>>() {
+        Call<ArrayList<MyDatabase.User>>call=userApi.fetchUsers();
+        call.enqueue(new Callback<ArrayList<MyDatabase.User>>() {
             @Override
-            public void onResponse(Call<ArrayList<UserLocation>> call, Response<ArrayList<UserLocation>> response) {
+            public void onResponse(Call<ArrayList<MyDatabase.User>> call, Response<ArrayList<MyDatabase.User>> response) {
                 downloadComplete.onDownloadComplete(response.body());
             }
 
             @Override
-            public void onFailure(Call<ArrayList<UserLocation>> call, Throwable t) {
+            public void onFailure(Call<ArrayList<MyDatabase.User>> call, Throwable t) {
                downloadComplete.onDownloadComplete(null);
             }
         });
@@ -260,21 +275,20 @@ public class DBManager {
         });
     }
     //deleteFollower
-    public static void deleteFollower(MyDatabase.User current, MyDatabase.User follower, final OnDownloadComplete<Boolean>onDownloadComplete)
+    public static void deleteFollower(String source, String target, final OnDownloadComplete<Triads.Follower>onDownloadComplete)
     {
-        Call<Void> call=userApi.deleteFollower(current.getUser_id(),follower.getUser_id());
-        call.enqueue(new Callback<Void>() {
+        Call<Triads.Follower> call=userApi.deleteFollower(source,target);
+        call.enqueue(new Callback<Triads.Follower>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                onDownloadComplete.onDownloadComplete(true);
+            public void onResponse(Call<Triads.Follower> call, Response<Triads.Follower> response) {
+                onDownloadComplete.onDownloadComplete(response.body());
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                onDownloadComplete.onDownloadComplete(false);
+            public void onFailure(Call<Triads.Follower> call, Throwable t) {
+                onDownloadComplete.onDownloadComplete(null);
             }
         });
-
     }
     //get User
     public static void getUserPublic(String user_id, final OnDownloadComplete<MyDatabase.User>onDownloadComplete)
@@ -293,18 +307,18 @@ public class DBManager {
         });
     }
     //deleteFollower
-    public static void addFollower(MyDatabase.User current, MyDatabase.User follower, final OnDownloadComplete<Boolean>onDownloadComplete)
+    public static void addFollower(String source, String target, final OnDownloadComplete<Triads.Follower>onDownloadComplete)
     {
-        Call<Void> call=userApi.addFollower(current.getUser_id(),follower.getUser_id());
-        call.enqueue(new Callback<Void>() {
+        Call<Triads.Follower> call=userApi.addFollower(source,target);
+        call.enqueue(new Callback<Triads.Follower>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                onDownloadComplete.onDownloadComplete(true);
+            public void onResponse(Call<Triads.Follower> call, Response<Triads.Follower> response) {
+                onDownloadComplete.onDownloadComplete(response.body());
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                onDownloadComplete.onDownloadComplete(false);
+            public void onFailure(Call<Triads.Follower> call, Throwable t) {
+                 onDownloadComplete.onDownloadComplete(null);
             }
         });
     }
@@ -421,118 +435,19 @@ public class DBManager {
         return !(id==-1);
     }
     //getting followers list
-    public static void getUsers(OnDownloadComplete<ArrayList<MyDatabase.User>>downloadComplete)
+    public static void fetchFollowers(String source, final OnDownloadComplete<ArrayList<MyDatabase.User>>downloadComplete)
     {
-        Networking<String,ArrayList<MyDatabase.User>>networking=new Networking<>(new InternetActivity<String, ArrayList<MyDatabase.User>>() {
+        Call<ArrayList<MyDatabase.User>>call=userApi.fetchFollowers(source);
+        call.enqueue(new Callback<ArrayList<MyDatabase.User>>() {
             @Override
-            public ArrayList<MyDatabase.User> doInBackground(String... args) {
-                String url=args[0];
-                String result=Networking.connectionResult(url);
-                ArrayList<MyDatabase.User>users=new ArrayList<>();
-                try{
-                    JSONArray jsonArray=new JSONArray(result);
-                    for(int i=0;i<jsonArray.length();i++)
-                    {
-                        JSONObject item=jsonArray.getJSONObject(i);
-                        String username=item.getString("name");
-                        String user_id=item.getString("user_id");
-                        String password="";
-                        MyDatabase.User user=new MyDatabase.User(user_id,username,password);
-                        users.add(user);
-                    }
-                }
-                catch(Exception e)
-                {
-                    Log.d("error_json",e.getLocalizedMessage());
-                }
-                return users;
+            public void onResponse(Call<ArrayList<MyDatabase.User>> call, Response<ArrayList<MyDatabase.User>> response) {
+                downloadComplete.onDownloadComplete(response.body());
             }
 
             @Override
-            public void onPostExecute(ArrayList<MyDatabase.User> result) {
-
-            }
-
-            @Override
-            public void onPreExecute(ArrayList<MyDatabase.User> result) {
-
-            }
-        },downloadComplete);
-        String url="https://triads.herokuapp.com/users";
-        networking.execute(url);
-    }
-    public static void addFollower(String source,String target)
-    {
-        Networking<String,Boolean> networking=new Networking<>(new InternetActivity<String, Boolean>() {
-            @Override
-            public Boolean doInBackground(String... args) {
-                String url=args[0];
-                String result=Networking.connectionResult(url);
-                return null;
-            }
-
-            @Override
-            public void onPostExecute(Boolean result) {
-
-            }
-
-            @Override
-            public void onPreExecute(Boolean result) {
-
-            }
-        }, new OnDownloadComplete<Boolean>() {
-            @Override
-            public void onDownloadComplete(Boolean result) {
-
+            public void onFailure(Call<ArrayList<MyDatabase.User>> call, Throwable t) {
+              downloadComplete.onDownloadComplete(null);
             }
         });
-        String url="https://triads.herokuapp.com/addFollower?source="+source+"&target="+target;
-        networking.execute(url);
-    }
-    public static void deleteFollower(String source,String target)
-    {
-
-        Networking<String,Boolean> networking=new Networking<>(new InternetActivity<String, Boolean>() {
-            @Override
-            public Boolean doInBackground(String... args) {
-                String url=args[0];
-                String result=Networking.connectionResult(url);
-                return null;
-            }
-
-            @Override
-            public void onPostExecute(Boolean result) {
-
-            }
-
-            @Override
-            public void onPreExecute(Boolean result) {
-
-            }
-        }, new OnDownloadComplete<Boolean>() {
-            @Override
-            public void onDownloadComplete(Boolean result) {
-
-            }
-        });
-        String url="https://triads.herokuapp.com/deleteFollower?source="+source+"&target="+target;
-        networking.execute(url);
-    }
-    public static HashMap<String,Integer> getFollowers(String result)
-    {
-        HashMap<String,Integer>followers=new HashMap<>();
-        try{
-        JSONArray array=new JSONArray(result);
-        for(int i=0;i<array.length();i++)
-        {
-            JSONObject item=array.getJSONObject(i);
-            followers.put(item.getString("target"),item.getInt("weight"));
-        }
-        }
-        catch (Exception e)
-        {
-
-        }
-        return followers;
     }
 }

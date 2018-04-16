@@ -5,9 +5,34 @@ package othello.com.example.bhavneetsingh.notes;
  */
 
 public class Cast implements ShowDetail {
-    String name,poster,link,description,character;
+    String name,poster_path,link,description,character,credit_id,id;
+    int gender;
     public Cast(String name) {
         this.name = name;
+    }
+
+    public String getCredit_id() {
+        return credit_id;
+    }
+
+    public void setCredit_id(String credit_id) {
+        this.credit_id = credit_id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public int getGender() {
+        return gender;
+    }
+
+    public void setGender(int gender) {
+        this.gender = gender;
     }
 
     @Override
@@ -22,12 +47,12 @@ public class Cast implements ShowDetail {
 
     @Override
     public String getPoster() {
-        return poster;
+        return poster_path;
     }
 
     @Override
     public void setPoster(String poster) {
-        this.poster = poster;
+        this.poster_path = poster;
     }
 
     @Override

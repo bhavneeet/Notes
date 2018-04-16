@@ -83,7 +83,7 @@ try{
         category="normal";
     if(category.equals("movie")||category.equals("tvshows"))
     {
-        Intent intent=new Intent(context,MoviesActivity.class);
+        Intent intent=new Intent(context,MovieDetailActivity.class);
         intent.putExtra(MyDatabase.User.USER_ID,userId);
         intent.putExtra(MyDatabase.User.NAME,user_name);
         intent.putExtra(MyDatabase.User.CATEGORY,category);

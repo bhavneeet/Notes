@@ -1,8 +1,9 @@
 package othello.com.example.bhavneetsingh.notes;
 
 public class Movie {
+    public static final String URL="movie_url";
     String name,id,description,poster;
-    String season_link,cast_link;
+    String season_link,cast_link,video_link;
 
 
     public Movie(String name) {
@@ -54,5 +55,13 @@ public class Movie {
 
     public void setPoster(String poster) {
         this.poster = poster;
+    }
+
+    public String getVideo_link() {
+        return video_link;
+    }
+
+    public void setVideo_link(String video_link) {
+        this.video_link = video_link;
     }
 }

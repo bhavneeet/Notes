@@ -2,6 +2,7 @@
 <android.support.design.widget.AppBarLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:fitsSystemWindows="true"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@style/AppTheme.AppBarOverlay"
     xmlns:android="http://schemas.android.com/apk/res/android">
@@ -10,9 +11,9 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:title="@string/app_name"
+        android:fitsSystemWindows="true"
         app:logo="@drawable/ic_dashboard_black_24dp"
         app:titleTextAppearance="@style/title"
-        android:layout_gravity="center_vertical"
         app:titleTextColor="@color/colorBlack"
         android:theme="@style/AppTheme.NoActionBar"
         app:popupTheme="@style/AppTheme.PopupOverlay">

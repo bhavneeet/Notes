@@ -19,7 +19,7 @@ import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 
-public class NewsActivity extends ToolbarActivity implements NewsAdapter.onNewsClickListener {
+public class NewsActivity extends AppCompatActivity implements NewsAdapter.onNewsClickListener {
 
     ArrayList<News>newsList;
     NewsAdapter newsAdapter;
@@ -28,11 +28,9 @@ public class NewsActivity extends ToolbarActivity implements NewsAdapter.onNewsC
     private MyDatabase.User user;
     Toolbar toolbar;
     News current;
-    @SuppressLint("MissingSuperCall")
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState,R.layout.activity_news);
-
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_news);
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
             Window window=getWindow();
             window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
@@ -50,14 +48,16 @@ public class NewsActivity extends ToolbarActivity implements NewsAdapter.onNewsC
             }
         });
    */
+/*
         toolbar=findViewById(R.id.toolbar);
         toolbar.setVisibility(View.GONE);
         toolbar.setBackgroundColor(getResources().getColor(R.color.colorWhiteTransparent));
+*/
         viewPager=(ViewPager)findViewById(R.id.news_list);
         newsList=new ArrayList<>();
         newsAdapter=new NewsAdapter(this,newsList,this);
         viewPager.setAdapter(newsAdapter);
-        viewPager.setPageTransformer(true,new HingeTransformation());
+        viewPager.setPageTransformer(true,new DepthTransformation());
         Intent intent=getIntent();
         if(intent!=null)
         {
@@ -90,14 +90,7 @@ public class NewsActivity extends ToolbarActivity implements NewsAdapter.onNewsC
     @Override
     public void onClick(News news) {
 
-        current=news;
-       if(toolbar.getVisibility()==View.VISIBLE)
-       {
-           toolbar.setVisibility(View.GONE);
-       }
-       else {
-           toolbar.setVisibility(View.VISIBLE);
-       }
+     startWebActivity(news);
     }
     public void startWebActivity(News news)
     {
@@ -105,7 +98,7 @@ public class NewsActivity extends ToolbarActivity implements NewsAdapter.onNewsC
         intent.putExtra(News.URL,news.getUrl());
         startActivity(intent);
     }
-    public boolean onCreateOptionsMenu(Menu menu)
+   /* public boolean onCreateOptionsMenu(Menu menu)
     {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.news_menu, menu);
@@ -115,5 +108,5 @@ public class NewsActivity extends ToolbarActivity implements NewsAdapter.onNewsC
         if(item.getItemId()==R.id.linkItem)
             startWebActivity(current);
         return true;
-    }
+    }*/
 }

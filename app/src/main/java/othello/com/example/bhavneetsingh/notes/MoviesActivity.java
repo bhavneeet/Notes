@@ -60,6 +60,7 @@ public class MoviesActivity extends AppCompatActivity {
             String category=intent.getStringExtra(MyDatabase.User.CATEGORY);
             user=new MyDatabase.User(user_id,user_name,"");
             user.setCategory(category);
+
         }
         refresh();
     }

@@ -23,8 +23,8 @@
         <item name="android:editTextColor">@color/colorBlack</item>
         <item name="android:textColorHint">@color/colorBlack</item>
         <item name="colorPrimary">@color/cardview_light_background</item>
-        <item name="android:textColorPrimaryInverse">@color/colorWhite</item>
-        <item name="colorPrimaryDark">@color/cardview_light_background</item>
+        <item name="android:textColorPrimaryInverse">@color/colorBlack</item>
+        <item name="colorPrimaryDark">@color/colorBlack</item>
         <item name="android:colorBackground">@color/colorWhite</item>
         <item name="android:navigationBarColor">@android:color/background_dark</item>
 
@@ -78,6 +78,18 @@
         <item name="android:textSize">25dp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">@font/aladin</item>
+    </style>
+
+    <style name="FullscreenTheme" parent="AppTheme">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
     </style>
     <!--    <style name="ToolBarStyle" parent="Theme.AppCompat">
         <item name="android:textColorPrimary">@android:color/white</item>

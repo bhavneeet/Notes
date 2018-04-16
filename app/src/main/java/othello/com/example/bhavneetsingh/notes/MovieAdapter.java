@@ -1,7 +1,9 @@
 package othello.com.example.bhavneetsingh.notes;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toolbar;
+import android.widget.VideoView;
 
 import com.squareup.picasso.Picasso;
 
@@ -35,33 +38,39 @@ public class MovieAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup collection, int position) {
         LayoutInflater inflater=context.getLayoutInflater();
-        View convertView=inflater.inflate(R.layout.movies_list,collection,false);
+        final View convertView=inflater.inflate(R.layout.content_movie,collection,false);
+
         final MovieHolder holder=new MovieHolder(convertView);
         int pos=position;
-        Movie news=moviesList.get(pos);
+        final Movie news=moviesList.get(pos);
         Picasso.get().load(news.getPoster()).fit().into(holder.poster);
         holder.title.setText(news.getName());
+/*
         holder.content.setText(news.getDescription());
+        holder.content.setMaxLines(1000);
         holder.button.setText("Load more");
         holder.button.setBackground(null);
         holder.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(holder.button.getText().equals("Load more"))
-                {
-                    holder.button.setText("Load less");
-                    holder.content.setMaxLines(1000);
-                }
-                else
-                {
-                    holder.button.setText("Load more");
-                    holder.content.setMaxLines(3);
-                }
+                Intent intent=new Intent(context,MovieDetailActivity.class);
+                intent.putExtra(MovieDetailActivity.ID,news.getId());
+                intent.putExtra(MovieDetailActivity.CATEGORY,"tvshows");
+                context.startActivity(intent);
             }
         });
-        collection.addView(convertView);
+        holder.play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context, VideoActivity.class);
 
-        DBManager.fetchSeasons(news.getId(), new OnDownloadComplete<ArrayList<Season>>() {
+                intent.putExtra(Movie.URL,"http://abhiandroid-8fb4.kxcdn.com/ui/wp-content/uploads/2016/04/videoviewtestingvideo.mp4");
+                context.startActivity(intent);
+            }
+        });
+
+*/
+        /*DBManager.fetchSeasons(news.getId(), new OnDownloadComplete<ArrayList<Season>>() {
             @Override
             public void onDownloadComplete(ArrayList<Season> result) {
              if(result!=null)
@@ -71,6 +80,19 @@ public class MovieAdapter extends PagerAdapter {
              }
             }
         });
+        DBManager.fetchCast(news.getId(),new OnDownloadComplete<ArrayList<Cast>>(){
+
+            @Override
+            public void onDownloadComplete(ArrayList<Cast> result) {
+                if(result!=null)
+                {
+                    holder.cast_list.clear();
+                    holder.cast_list.addAll(result);
+                    holder.cast_adapter.notifyDataSetChanged();
+                }
+            }
+        });*/
+        collection.addView(convertView);
         return  convertView;
     }
 
@@ -91,20 +113,25 @@ public class MovieAdapter extends PagerAdapter {
     class MovieHolder{
         ImageView poster;
         TextView title;
-        TextView content;
+  /*      TextView content;
         Button button;
-        RecyclerView season_view,cast_view;
+        FloatingActionButton play;*/
+/*        RecyclerView season_view,cast_view;
         ShowDetailAdapter season_adapter,cast_adapter;
-        ArrayList<ShowDetail>season_list,cast_list;
+        ArrayList<ShowDetail>season_list,cast_list;*/
         android.support.v7.widget.Toolbar toolbar;
         public MovieHolder(View itemView) {
+
             poster=(ImageView)itemView.findViewById(R.id.movie_poster);
             title=(TextView)itemView.findViewById(R.id.movie_description_title);
-            content=(TextView)itemView.findViewById(R.id.movie_description);
-            button=(Button)itemView.findViewById(R.id.load_more);
+/*            content=(TextView)itemView.findViewById(R.id.movie_description);
+            button=(Button)itemView.findViewById(R.id.load_more);*/
 /*            toolbar=itemView.findViewById(R.id.movie_toolbar);*/
- //init
-            LinearLayout season=itemView.findViewById(R.id.seasons_list),cast=itemView.findViewById(R.id.cast_list);
+            //init
+            /*play=itemView.findViewById(R.id.fab);
+            *//*LinearLayout season=itemView.findViewById(R.id.seasons_list),cast=itemView.findViewById(R.id.cast_list);
+            ((TextView)season.findViewById(R.id.item_heading)).setText("Seasons");
+            ((TextView)cast.findViewById(R.id.item_heading)).setText("Casts");
             season_list=new ArrayList<>();
             cast_list=new ArrayList<>();
             season_view=season.findViewById(R.id.items_list);
@@ -118,7 +145,7 @@ public class MovieAdapter extends PagerAdapter {
             cast_view.setAdapter(cast_adapter);
             LinearLayoutManager cast_manager=new LinearLayoutManager(itemView.getContext());
             cast_manager.setOrientation(LinearLayoutManager.HORIZONTAL);
-            cast_view.setLayoutManager(cast_manager);
+            cast_view.setLayoutManager(cast_manager);*/
             //season title
         }
     }

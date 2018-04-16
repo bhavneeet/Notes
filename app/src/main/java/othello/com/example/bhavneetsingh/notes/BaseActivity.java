@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import com.facebook.login.LoginManager;
 import com.squareup.picasso.Picasso;
 
 public  class BaseActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -87,12 +88,15 @@ public  class BaseActivity extends AppCompatActivity implements NavigationView.O
     }
     public void logOut()
     {
-        SharedPreferences sharedPreferences=getSharedPreferences(LoginActivity.LOGIN,MODE_PRIVATE);
+      /*  SharedPreferences sharedPreferences=getSharedPreferences(LoginActivity.LOGIN,MODE_PRIVATE);
         SharedPreferences.Editor editor=sharedPreferences.edit();
         editor.clear();
         editor.apply();
-        drawer.closeDrawer(GravityCompat.START);
-        Intent intent=new Intent(this,LoginActivity.class);
+      */
+      if(LoginManager.getInstance()!=null)
+        LoginManager.getInstance().logOut();
+      drawer.closeDrawer(GravityCompat.START);
+      Intent intent=new Intent(this,LoginActivity.class);
         intent.putExtra(LoginActivity.LOGOUT,true);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);

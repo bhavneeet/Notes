@@ -1,105 +1,38 @@
 package othello.com.example.bhavneetsingh.notes;
 
-import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
-import android.app.Dialog;
-import android.app.LauncherActivity;
-import android.app.Notification;
 import android.app.SearchManager;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabaseLockedException;
-import android.database.sqlite.SQLiteOpenHelper;
-import android.drm.DrmStore;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.provider.Telephony;
-import android.support.annotation.NonNull;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.transition.AutoTransition;
-import android.transition.Explode;
-import android.transition.Fade;
-import android.transition.Slide;
-import android.transition.Visibility;
-import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.GridLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
+import com.facebook.Profile;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
-
-import pl.droidsonroids.gif.GifImageView;
-
-import static othello.com.example.bhavneetsingh.notes.LoginActivity.LOGIN;
-import static othello.com.example.bhavneetsingh.notes.LoginActivity.NULL;
 
 public class MainActivity extends BaseActivity {
 
@@ -115,10 +48,11 @@ public class MainActivity extends BaseActivity {
     private ProgressBar bar;
     private static MyDatabase.User current_user;
     private UserListAdapter adapter;
-    private final ArrayList<MyDatabase.User>followers=new ArrayList<>();
+    private final static ArrayList<MyDatabase.User>followers=new ArrayList<>();
     private final ArrayList<MyDatabase.User>users=new ArrayList<>();
     private SwipeRefreshLayout refreshIcon;
     private PostsDatabase postsDatabase;
+    public static MyDatabase.User currentStaticUser;
     @SuppressLint("MissingSuperCall")
     @Override
     protected final void onCreate(Bundle savedInstanceState) {
@@ -196,6 +130,7 @@ public class MainActivity extends BaseActivity {
         //Initializing Popup menu
         profilePic=new PopupWindow(this);
         refresh();
+        fetchFollowers();
 
     }
     public void initList()
@@ -210,15 +145,17 @@ public class MainActivity extends BaseActivity {
 
     }
     public void fetchFollowers(){
+        refreshIcon.setRefreshing(true);
         DBManager.fetchFollowers(current_user, new OnDownloadComplete<ArrayList<MyDatabase.User>>() {
             @Override
             public void onDownloadComplete(ArrayList<MyDatabase.User> result) {
-            if(result!=null)
+                refreshIcon.setRefreshing(false);
+                if(result!=null)
             {
                 followers.clear();
                 followers.addAll(result);
                 adapter.notifyDataSetChanged();
-                refreshIcon.setRefreshing(false);
+
             }
               }
                }
@@ -228,13 +165,10 @@ public class MainActivity extends BaseActivity {
     //login
     public void login()
     {
-        SharedPreferences sharedPreferences;
-        sharedPreferences=getSharedPreferences(LoginActivity.LOGIN,MODE_PRIVATE);
-        String userid=sharedPreferences.getString(MyDatabase.User.USER_ID,LoginActivity.NULL);
-        String name=sharedPreferences.getString(MyDatabase.User.NAME,LoginActivity.NULL);
-        String profile=sharedPreferences.getString(MyDatabase.User.PROFILE_PICTURE,LoginActivity.NULL);
-        current_user=new MyDatabase.User(userid,name,"");
-        current_user.setProfilePictureUrl(profile);
+        Profile profile=Profile.getCurrentProfile();
+        current_user=new MyDatabase.User(profile.getId(),profile.getName(),"");
+        current_user.setProfilePictureUrl(profile.getProfilePictureUri(480,480).toString());
+        currentStaticUser=current_user;
     }
     public void onStart()
     {
@@ -310,7 +244,7 @@ public class MainActivity extends BaseActivity {
         searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                
+                startSearch(query);
                 return true;
             }
 
@@ -320,6 +254,12 @@ public class MainActivity extends BaseActivity {
             }
         });
         return true;
+    }
+    public void startSearch(String name)
+    {
+        Intent intent=new Intent(this,MapsActivity.class);
+        intent.putExtra(MapsActivity.SEARCH,name);
+        startActivity(intent);
     }
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -439,12 +379,12 @@ public class MainActivity extends BaseActivity {
             (imageView).setImageBitmap(user.getProfilePicture());
             ((TextView)convertView.findViewById(R.id.icon_title)).setText(user.getName());
             final MyDatabase.User copy=user;
-            ((ImageView)convertView.findViewById(R.id.follow)).setOnClickListener(new View.OnClickListener() {
+            /*((ImageView)convertView.findViewById(R.id.follow)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     follow(v,copy);
                 }
-            });
+            });*/
             profilePic.setElevation(20);
             profilePic.setFocusable(true);
             View root=findViewById(R.id.content_home);
@@ -462,23 +402,39 @@ public class MainActivity extends BaseActivity {
         startActivityForResult(intent, PostActivity.POSTACTIVITY);
     }
     //Following process
-    public void follow(View v, MyDatabase.User user)
+    public static void follow( View v, MyDatabase.User user)
     {
-        String user_id=user.getUser_id();
-        /*if(!current_user.getUser_id().equals(user_id))
 
+        final View button=v;
+        MyDatabase.User current_user=currentStaticUser;
+        String user_id=user.getUser_id();
+        if(current_user.getUser_id().equals(user_id))
+        if(v.getAlpha()==1)
         {
-            if(followers.containsKey(user))
-        {
-            v.setAlpha((float)1);
-            followers.remove(user);
-            DBManager.deleteFollower(current_user.getUser_id(),user_id);
+            v.setAlpha((float)0.3);
+            DBManager.addFollower(current_user.getUser_id(), user_id, new OnDownloadComplete<Triads.Follower>() {
+                @Override
+                public void onDownloadComplete(Triads.Follower result) {
+                    if(result==null||!result.result.equals("false"))
+                    {
+                     button.setAlpha(1);
+                    }
+                }
+            });
         }
-        else {
-            followers.put(user,1);
-            v.setAlpha((float)0.5);
-            DBManager.addFollower(current_user.getUser_id(),user_id);
-        }}*/
+        else
+        {
+            v.setAlpha(1);
+            DBManager.deleteFollower(current_user.getUser_id(), user_id, new OnDownloadComplete<Triads.Follower>() {
+                @Override
+                public void onDownloadComplete(Triads.Follower result) {
+                    if(result==null||!result.result.equals("false"))
+                    {
+                        button.setAlpha((float)0.3);
+                    }
+                }
+            });
+        }
     }
     /*//When menuitem of tList.get(pos).getUser().getUser_id().equals(current_user.getUser_id()))
         {

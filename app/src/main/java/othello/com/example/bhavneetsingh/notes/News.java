@@ -3,10 +3,10 @@ package othello.com.example.bhavneetsingh.notes;
 
 public class News {
    public static final String URL="newslink";
-    String title,context,image,author,date,url;
+    String title,content,image,author,date,url;
     public News(String title, String context) {
         this.title = title;
-        this.context = context;
+        this.content = context;
     }
     public String getUrl() {
         return url;
@@ -25,11 +25,11 @@ public class News {
     }
 
     public String getContext() {
-        return context;
+        return content;
     }
 
     public void setContext(String context) {
-        this.context = context;
+        this.content = context;
     }
 
     public String getImage() {
