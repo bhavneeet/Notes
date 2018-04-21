@@ -50,7 +50,7 @@ public class Movie {
     }
 
     public String getPoster() {
-        return poster;
+        return "http://image.tmdb.org/t/p/original/"+poster;
     }
 
     public void setPoster(String poster) {

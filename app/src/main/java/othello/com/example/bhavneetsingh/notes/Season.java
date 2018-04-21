@@ -2,6 +2,7 @@ package othello.com.example.bhavneetsingh.notes;
 
 
 public class Season implements ShowDetail{
+    
     String name,poster_path,link,description,air_date;
 
     public Season(String name, String poster) {
@@ -11,6 +12,11 @@ public class Season implements ShowDetail{
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getFullName() {
+        return null;
     }
 
     public void setName(String name) {

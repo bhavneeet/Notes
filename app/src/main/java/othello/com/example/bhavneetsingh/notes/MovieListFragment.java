@@ -30,25 +30,41 @@ public class MovieListFragment extends Fragment {
     private ArrayList<Movie>movies;
     private MovieAdapter movieAdapter;
     private ViewPager viewPager;
-    private OnFragmentInteractionListener mListener;
 
+    public ViewPager getViewPager() {
+
+        return viewPager;
+    }
+
+    public MovieAdapter getMovieAdapter() {
+        return movieAdapter;
+    }
+
+    private OnFragmentInteractionListener mListener;
+    private int current_position=-1;
+    MovieAdapter.MovieSelectedListener movieSelectedListener;
     @SuppressLint("ValidFragment")
     private MovieListFragment() {
         // Required empty public constructor
     }
-    public static MovieListFragment newInstance(MyDatabase.User user) {
+    public static MovieListFragment newInstance(MyDatabase.User user, MovieAdapter.MovieSelectedListener movieSelectedListener) {
         MovieListFragment fragment = new MovieListFragment();
+        fragment.movieSelectedListener=movieSelectedListener;
         fragment.user=user;
         return fragment;
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        movies=new ArrayList<>();
-        movieAdapter=new MovieAdapter(getActivity(),movies);
-
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        movies=new ArrayList<>();
+        movieAdapter=new MovieAdapter(getActivity(),movies);
+        movieAdapter.setMovieSelectedListener(movieSelectedListener);
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -62,6 +78,12 @@ public class MovieListFragment extends Fragment {
         viewPager.setPageTransformer(true,new CubeInDepthTransformation());
         viewPager.setAdapter(movieAdapter);
         refresh();
+    }
+
+    public Movie getCurrentMovie()
+    {
+        current_position=viewPager.getCurrentItem();
+        return movies.get(current_position);
     }
     public void refresh()
     {

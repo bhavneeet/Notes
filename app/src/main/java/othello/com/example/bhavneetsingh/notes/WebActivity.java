@@ -8,6 +8,8 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
+
 public class WebActivity extends ToolbarActivity {
 
     private String url;
@@ -21,8 +23,9 @@ public class WebActivity extends ToolbarActivity {
         {
             url=intent.getStringExtra(News.URL);
         }
-        webView=findViewById(R.id.web_browser);
-        webView.setWebViewClient(new BrowserClient());
+        webView=findViewById(R.id.web_view);
+        SmoothProgressBar progressBar=findViewById(R.id.web_progress_bar);
+        webView.setWebViewClient(new BrowserClient(progressBar));
         webView.getSettings().setLoadsImagesAutomatically(true);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);

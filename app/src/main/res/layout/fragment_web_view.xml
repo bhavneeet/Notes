@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/web_layout"
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent">
@@ -10,16 +11,16 @@
         android:id="@+id/web_progress_bar"
         android:layout_width="match_parent"
         android:layout_height="5dp"
+        app:spb_sections_count="4"
         android:indeterminate="true"
         app:spb_colors="@array/colors_progressBar"
-        app:spb_mirror_mode="true"
+        app:spb_stroke_width="4dp"
+        app:spb_stroke_separator_length="4dp"
+        app:spb_reversed="false"
+        app:spb_mirror_mode="false"
         app:spb_progressiveStart_activated="true"
         app:spb_progressiveStart_speed="1.5"
-        app:spb_progressiveStop_speed="3.4"
-        app:spb_reversed="true"
-        app:spb_speed="4.0"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="24dp" />
+        app:spb_progressiveStop_speed="3.4" />
 
     <WebView
         android:id="@+id/web_view"

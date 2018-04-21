@@ -3,6 +3,7 @@ package othello.com.example.bhavneetsingh.notes;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -19,6 +20,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private String id,category;
     private SeasonFragment seasonFragment;
     private CastFragment castFragment;
+    private Movie current_movie;
     FragmentManager fragmentManager;
     android.support.v4.app.FragmentTransaction fragmentTransaction;
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -26,6 +28,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
             android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
             switch (item.getItemId()) {
@@ -43,6 +46,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     };
     private MyDatabase.User user;
     private MovieListFragment movieListFragment;
+    private BottomNavigationView navigation;
     public void addFragment(android.support.v4.app.Fragment fragment)
     {
         android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -54,7 +58,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
-        android.support.v7.widget.Toolbar toolbar=findViewById(R.id.toolbar);
+        final android.support.v7.widget.Toolbar toolbar=findViewById(R.id.toolbar);
         Intent intent=getIntent();
         if(intent!=null)
         {
@@ -67,20 +71,40 @@ public class MovieDetailActivity extends AppCompatActivity {
         }
         fragmentManager = getSupportFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
-        movieListFragment=MovieListFragment.newInstance(user);
+        seasonFragment=SeasonFragment.newInstance(id);
+        castFragment=CastFragment.newInstance(id);
+        movieListFragment=MovieListFragment.newInstance(user,new MovieAdapter.MovieSelectedListener() {
+            @Override
+            public void onSelectedMovie(int pos,Movie movie) {
+                id=movie.getId();
+                removeFragment(movieListFragment);
+                navigation.setVisibility(View.VISIBLE);
+                seasonFragment.setMovieId(id);
+                addFragment(seasonFragment);
+                castFragment.setMovieId(id);
+            }
+        });;
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 addFragment(movieListFragment);
+                navigation.setVisibility(View.GONE);
             }
         });
-
-        /*seasonFragment=SeasonFragment.newInstance(id);
-        castFragment=CastFragment.newInstance(id);
-        fragmentTransaction.replace(R.id.movie_container,seasonFragment,"Helo");
-        fragmentTransaction.commit();
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);*/
+        navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
     }
+    public void removeFragment(android.support.v4.app.Fragment fragment)
+    {
+        android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.remove(fragment);
+        fragmentTransaction.commit();
+    }
+    public void addMovieFragment(android.support.v4.app.Fragment fragment)
+    {
+        android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.movie_container,fragment,"Helo");
+        fragmentTransaction.commit();
 
+    }
 }

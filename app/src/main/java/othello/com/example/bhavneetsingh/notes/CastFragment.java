@@ -17,12 +17,19 @@ public class CastFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private String id;
     private RecyclerView seasonView;
-    private ShowDetailAdapter seasonAdapter;
-    private ArrayList<ShowDetail>seasons;
+    private ShowDetailAdapter castsAdapter;
+    private ArrayList<ShowDetail> casts;
     private View view;
     @SuppressLint("ValidFragment")
     private CastFragment() {
         // Required empty public constructor
+    }
+    public String getMovieId() {
+        return id;
+    }
+
+    public void setMovieId(String id) {
+        this.id = id;
     }
 
 
@@ -37,9 +44,7 @@ public class CastFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            id=getArguments().getString(MovieDetailActivity.ID);
-        }
+
 
     }
 
@@ -55,18 +60,21 @@ public class CastFragment extends Fragment {
         this.view= view;
         seasonView=view.findViewById(R.id.seasons_list);
         seasonView.setLayoutManager(new GridLayoutManager(getContext(),2));
-        seasons=new ArrayList<>();
-        seasonAdapter=new ShowDetailAdapter(getContext(),seasons);
-        seasonView.setAdapter(seasonAdapter);
-        fetchSeasons();
+        casts =new ArrayList<>();
+        castsAdapter =new ShowDetailAdapter(getActivity(), casts);
+        seasonView.setAdapter(castsAdapter);
+        fetchCasts();
     }
-    public void fetchSeasons()
+    public void fetchCasts()
     {
         DBManager.fetchCast(id, new OnDownloadComplete<ArrayList<Cast>>() {
             @Override
             public void onDownloadComplete(ArrayList<Cast> result) {
-                seasons.addAll(result);
-                seasonAdapter.notifyDataSetChanged();
+                if(result!=null)
+                {
+                    casts.addAll(result);
+                    castsAdapter.notifyDataSetChanged();
+                }
             }
         });
     }

@@ -41,6 +41,11 @@ public class Cast implements ShowDetail {
     }
 
     @Override
+    public String getFullName() {
+        return null;
+    }
+
+    @Override
     public void setName(String name) {
         this.name = name;
     }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,12 +35,17 @@ public class SeasonFragment extends Fragment {
         return fragment;
     }
 
+    public String getMovieId() {
+        return id;
+    }
+
+    public void setMovieId(String id) {
+        this.id = id;
+            }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-         id=getArguments().getString(MovieDetailActivity.ID);
-        }
 
     }
 
@@ -56,17 +62,21 @@ public class SeasonFragment extends Fragment {
         seasonView=view.findViewById(R.id.seasons_list);
         seasonView.setLayoutManager(new GridLayoutManager(getContext(),2));
         seasons=new ArrayList<>();
-        seasonAdapter=new ShowDetailAdapter(getContext(),seasons);
+        seasonAdapter=new ShowDetailAdapter(getActivity(),seasons);
         seasonView.setAdapter(seasonAdapter);
-       fetchSeasons();
+        fetchSeasons();
     }
     public void fetchSeasons()
     {
      DBManager.fetchSeasons(id, new OnDownloadComplete<ArrayList<Season>>() {
          @Override
          public void onDownloadComplete(ArrayList<Season> result) {
-             seasons.addAll(result);
-             seasonAdapter.notifyDataSetChanged();
+             Log.d("season",""+id);
+            if(result!=null)
+            {
+                seasons.addAll(result);
+                seasonAdapter.notifyDataSetChanged();
+            }
          }
      });
     }

@@ -79,7 +79,12 @@
         <item name="android:textStyle">bold</item>
         <item name="android:fontFamily">@font/aladin</item>
     </style>
-
+    <style name="tab_item" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/colorBlack</item>
+        <item name="android:textSize">20dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/aladin</item>
+    </style>
     <style name="FullscreenTheme" parent="AppTheme">
         <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
         <item name="android:windowActionBarOverlay">true</item>

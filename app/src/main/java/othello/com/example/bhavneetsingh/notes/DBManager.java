@@ -141,7 +141,7 @@ public class DBManager {
     //fetching movies
     public static void fetchMovies(MyDatabase.User user, final OnDownloadComplete<ArrayList<Movie>>downloadComplete)
     {
-        Call<ArrayList<Movie>>call=userApi.fetchMovies(user.getUser_id());
+        Call<ArrayList<Movie>>call=userApi.fetchMovies(user.getUser_id(),1);
         call.enqueue(new Callback<ArrayList<Movie>>() {
             @Override
             public void onResponse(Call<ArrayList<Movie>> call, Response<ArrayList<Movie>> response) {
@@ -151,6 +151,21 @@ public class DBManager {
             @Override
             public void onFailure(Call<ArrayList<Movie>> call, Throwable t) {
             downloadComplete.onDownloadComplete(null);
+            }
+        });
+    }
+    public static void fetchMovies(MyDatabase.User user,int page, final OnDownloadComplete<ArrayList<Movie>>downloadComplete)
+    {
+        Call<ArrayList<Movie>>call=userApi.fetchMovies(user.getUser_id(),page);
+        call.enqueue(new Callback<ArrayList<Movie>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Movie>> call, Response<ArrayList<Movie>> response) {
+                downloadComplete.onDownloadComplete(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Movie>> call, Throwable t) {
+                downloadComplete.onDownloadComplete(null);
             }
         });
     }

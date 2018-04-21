@@ -46,6 +46,7 @@
         </activity>
         <activity
             android:name=".PostActivity"
+
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -66,9 +67,11 @@
         <activity
             android:name=".MoviesActivity"
             android:label="@string/title_activity_movies"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".NewsActivity"
+            android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".FacebookLogin" />
         <activity
@@ -91,18 +94,29 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+
         <activity
             android:name=".MapsActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/title_activity_maps"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".VideoActivity"
             android:label="@string/title_activity_video"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:theme="@style/AppTheme.NoActionBar"
             android:name=".MovieDetailActivity"
-            android:label="@string/title_activity_movie_detail"></activity>
+            android:label="@string/title_activity_movie_detail"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".MovieWebView"
+            android:label="@string/title_activity_main2"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            />
     </application>
 
 </manifest>

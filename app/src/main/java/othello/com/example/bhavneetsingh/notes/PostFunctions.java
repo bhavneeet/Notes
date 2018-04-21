@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Slide;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -39,6 +41,7 @@ public class PostFunctions implements PostListAdapter.OnClickIcon,PostListAdapte
         this.recyclerView=recyclerView;
     }
     private View convertView;
+
     public void onClickIcon(View view, MyDatabase.User user) {
 
         {
@@ -48,15 +51,12 @@ public class PostFunctions implements PostListAdapter.OnClickIcon,PostListAdapte
                 //Setting Proflie Image
                 profilePic.setContentView(convertView);
             }
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
-/*                 profilePic.setEnterTransition(new Slide());
-                 profilePic.setOverlapAnchor(false);
-                 profilePic.setExitTransition(new Slide());*/
-            }
-
-            /*View v=(convertView.findViewById(R.id.follow));
-            *//*if(!current_user.getUser_id().equals(user.getUser_id()))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                profilePic.setEnterTransition(new Slide());
+                profilePic.setExitTransition(new Slide());
+            }        /*View v=(convertView.findViewById(R.id.follow));
+                        *  *//*if(!current_user.getUser_id().equals(user.getUser_id()))
             {
                 if(followers.containsKey(user.getUser_id()))
                 {

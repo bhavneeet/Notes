@@ -8,6 +8,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,31 @@ import retrofit2.http.POST;
 public class MovieAdapter extends PagerAdapter {
     Activity context;
     ArrayList<Movie>moviesList;
+    MovieSelectedListener movieSelectedListener;
+    private int last_page=0;
+    private int count=1;
+    public MovieSelectedListener getMovieSelectedListener() {
+        return movieSelectedListener;
+    }
+    public interface OnPageEndListener{
+      void  onPageEnd(int last_page,ArrayList<Movie>movies);
+    }
+    public void setMovieSelectedListener(MovieSelectedListener movieSelectedListener) {
+        this.movieSelectedListener = movieSelectedListener;
+    }
+
+    interface MovieSelectedListener{
+        void onSelectedMovie(int postion,Movie movie);
+    }
+    private OnPageEndListener onPageEndListener;
+
+    public OnPageEndListener getOnPageEndListener() {
+        return onPageEndListener;
+    }
+
+    public void setOnPageEndListener(OnPageEndListener onPageEndListener) {
+        this.onPageEndListener = onPageEndListener;
+    }
 
     public MovieAdapter(Activity context, ArrayList<Movie> moviesList) {
         this.context = context;
@@ -41,57 +67,28 @@ public class MovieAdapter extends PagerAdapter {
         final View convertView=inflater.inflate(R.layout.content_movie,collection,false);
 
         final MovieHolder holder=new MovieHolder(convertView);
-        int pos=position;
+        final int pos=position;
         final Movie news=moviesList.get(pos);
         Picasso.get().load(news.getPoster()).fit().into(holder.poster);
         holder.title.setText(news.getName());
-/*
-        holder.content.setText(news.getDescription());
-        holder.content.setMaxLines(1000);
-        holder.button.setText("Load more");
-        holder.button.setBackground(null);
-        holder.button.setOnClickListener(new View.OnClickListener() {
+        holder.getItemView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(context,MovieDetailActivity.class);
-                intent.putExtra(MovieDetailActivity.ID,news.getId());
-                intent.putExtra(MovieDetailActivity.CATEGORY,"tvshows");
-                context.startActivity(intent);
-            }
-        });
-        holder.play.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(context, VideoActivity.class);
-
-                intent.putExtra(Movie.URL,"http://abhiandroid-8fb4.kxcdn.com/ui/wp-content/uploads/2016/04/videoviewtestingvideo.mp4");
-                context.startActivity(intent);
-            }
-        });
-
-*/
-        /*DBManager.fetchSeasons(news.getId(), new OnDownloadComplete<ArrayList<Season>>() {
-            @Override
-            public void onDownloadComplete(ArrayList<Season> result) {
-             if(result!=null)
-             {
-                 holder.season_list.addAll(result);
-                 holder.season_adapter.notifyDataSetChanged();
-             }
-            }
-        });
-        DBManager.fetchCast(news.getId(),new OnDownloadComplete<ArrayList<Cast>>(){
-
-            @Override
-            public void onDownloadComplete(ArrayList<Cast> result) {
-                if(result!=null)
+                if(movieSelectedListener!=null)
                 {
-                    holder.cast_list.clear();
-                    holder.cast_list.addAll(result);
-                    holder.cast_adapter.notifyDataSetChanged();
+                    movieSelectedListener.onSelectedMovie(pos,moviesList.get(pos));
                 }
             }
-        });*/
+        });
+        Log.d("page",pos+"=="+last_page);
+        if(pos==moviesList.size()-1&&pos!=last_page)
+        {
+            if(onPageEndListener!=null)
+            {
+                last_page=pos;
+                onPageEndListener.onPageEnd(++count,moviesList);
+            }
+        }
         collection.addView(convertView);
         return  convertView;
     }
@@ -113,15 +110,25 @@ public class MovieAdapter extends PagerAdapter {
     class MovieHolder{
         ImageView poster;
         TextView title;
-  /*      TextView content;
-        Button button;
-        FloatingActionButton play;*/
+        View itemView;
+
+        public View getItemView() {
+            return itemView;
+        }
+
+        public void setItemView(View itemView) {
+            this.itemView = itemView;
+        }
+
+        /*      TextView content;
+                Button button;
+                FloatingActionButton play;*/
 /*        RecyclerView season_view,cast_view;
         ShowDetailAdapter season_adapter,cast_adapter;
         ArrayList<ShowDetail>season_list,cast_list;*/
         android.support.v7.widget.Toolbar toolbar;
         public MovieHolder(View itemView) {
-
+            setItemView(itemView);
             poster=(ImageView)itemView.findViewById(R.id.movie_poster);
             title=(TextView)itemView.findViewById(R.id.movie_description_title);
 /*            content=(TextView)itemView.findViewById(R.id.movie_description);

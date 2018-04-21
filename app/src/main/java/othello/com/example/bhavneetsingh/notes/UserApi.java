@@ -28,7 +28,7 @@ public interface UserApi {
     @GET("userPosts/news")
     Call<ArrayList<News>> fetchNews(@Query("user_id")String user_id);
     @GET("userPosts/tvshows")
-    Call<ArrayList<Movie>> fetchMovies(@Query("user_id")String user_id);
+    Call<ArrayList<Movie>> fetchMovies(@Query("user_id")String user_id,@Query("page")int page);
     @GET("/imdb/tvshows/seasons")
     Call<ArrayList<Season>> fetchSeason(@Query("id") String id);
     @GET("/imdb/tvshows/casts")

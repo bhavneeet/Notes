@@ -1,6 +1,8 @@
 package othello.com.example.bhavneetsingh.notes;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,9 +19,9 @@ import java.util.ArrayList;
 public class ShowDetailAdapter extends RecyclerView.Adapter<ShowDetailAdapter.ShowDetailHolder>{
 
     public ArrayList<ShowDetail>showDetails;
-    public Context context;
+    public Activity context;
 
-    public ShowDetailAdapter(Context context, ArrayList<ShowDetail> showDetails) {
+    public ShowDetailAdapter(Activity context, ArrayList<ShowDetail> showDetails) {
         this.showDetails = showDetails;
         this.context = context;
     }
@@ -35,8 +37,25 @@ public class ShowDetailAdapter extends RecyclerView.Adapter<ShowDetailAdapter.Sh
 
     @Override
     public void onBindViewHolder(@NonNull ShowDetailHolder holder, int position) {
-        int pos=holder.getAdapterPosition();
+        final int pos=holder.getAdapterPosition();
         ShowDetail showDetail=showDetails.get(pos);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context,WebActivity.class);
+                String url="https://www.google.co.in/search?q=";
+                String query=showDetails.get(pos).getName();
+                String arr[]=query.split("");
+                query="";
+                for(String s:arr)
+                {
+                    query=query+"+"+s;
+                }
+                url=url+query;
+                intent.putExtra(News.URL,url);
+                context.startActivity(intent);
+            }
+        });
         holder.show_name.setText(showDetail.getName());
         Picasso.get().load(showDetail.getPoster()).fit().into(holder.show_image);
     }

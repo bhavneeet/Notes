@@ -6,7 +6,7 @@ package othello.com.example.bhavneetsingh.notes;
 
 public interface ShowDetail {
     public String getName();
-
+    public String getFullName();
     public void setName(String name) ;
 
     public String getPoster() ;
