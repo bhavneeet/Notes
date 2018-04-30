@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    tools:context="othello.com.example.bhavneetsingh.notes.PostActivity">
+    tools:context="othello.com.example.bhavneetsingh.Triads.Posts.PostActivity">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_image"

@@ -5,10 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/post_background"
-    tools:context="othello.com.example.bhavneetsingh.notes.UserPosts">
+    tools:context="othello.com.example.bhavneetsingh.Triads.Posts.UserPosts">
 
     <include
-        android:id="@+id/include3"
         layout="@layout/content_user_posts"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -8,7 +8,7 @@
         android:layout_height="match_parent"
         android:background="@color/colorWhite"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context="othello.com.example.bhavneetsingh.notes.PostActivity">
+        tools:context="othello.com.example.bhavneetsingh.Triads.Posts.PostActivity">
 
         <include
             android:id="@+id/profile"
@@ -21,7 +21,6 @@
             android:layout_width="244dp" />
 
     <android.support.constraint.ConstraintLayout
-        android:id="@+id/linearLayout2"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"

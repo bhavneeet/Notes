@@ -6,10 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="othello.com.example.bhavneetsingh.notes.MovieWebView">
+    tools:context="othello.com.example.bhavneetsingh.Triads.Movies.MovieWebView">
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
@@ -25,31 +24,27 @@
             app:tabTextAppearance="@style/tab_item"
             android:layout_height="75dp">
             <android.support.design.widget.TabItem
-                android:id="@+id/tabItem2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Google" />
 
             <android.support.design.widget.TabItem
-                android:id="@+id/tabItem3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Wikepedia" />
             <android.support.design.widget.TabItem
-                android:id="@+id/tabItem4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Youtube" />
             <android.support.design.widget.TabItem
-            android:id="@+id/tabItem1"
-            android:layout_width="wrap_content"
+                android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="1movies" />
 
         </android.support.design.widget.TabLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <othello.com.example.bhavneetsingh.notes.CustomViewPager
+    <othello.com.example.bhavneetsingh.Triads.Main.CustomViewPager
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

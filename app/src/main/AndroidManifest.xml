@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="othello.com.example.bhavneetsingh.notes">
+    package="othello.com.example.bhavneetsingh.Triads">
 
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
@@ -30,7 +30,7 @@
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
         <activity
-            android:name=".MainActivity"
+            android:name="othello.com.example.bhavneetsingh.Triads.Main.MainActivity"
             android:configChanges="orientation|screenSize"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
@@ -45,15 +45,12 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity
-            android:name=".PostActivity"
+            android:name="othello.com.example.bhavneetsingh.Triads.Posts.PostActivity"
 
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".CommentsActivity"
-            android:configChanges="orientation|screenSize" />
-        <activity
-            android:name=".LoginActivity"
+            android:name="othello.com.example.bhavneetsingh.Triads.Main.LoginActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/login_theme">
             <intent-filter>
@@ -62,25 +59,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FriendsSuggestions" />
-        <activity android:name=".SearchActivity" />
+        <activity android:name="othello.com.example.bhavneetsingh.Triads.User.FriendsSuggestions" />
         <activity
-            android:name=".MoviesActivity"
+            android:name="othello.com.example.bhavneetsingh.Triads.Movies.MoviesActivity"
             android:label="@string/title_activity_movies"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".NewsActivity"
+            android:name="othello.com.example.bhavneetsingh.Triads.News.NewsActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".FacebookLogin" />
+        <activity android:name="othello.com.example.bhavneetsingh.Triads.Main.FacebookLogin" />
         <activity
-            android:name=".UserPosts"
+            android:name="othello.com.example.bhavneetsingh.Triads.Posts.UserPosts"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_user_posts"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".WebActivity"
+            android:name="othello.com.example.bhavneetsingh.Triads.WebBrowser.WebActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar" />
         <!--
@@ -96,23 +92,18 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name="othello.com.example.bhavneetsingh.Triads.Search.MapsActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/title_activity_maps"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".VideoActivity"
-            android:label="@string/title_activity_video"
-            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".MovieDetailActivity"
+            android:name="othello.com.example.bhavneetsingh.Triads.Movies.MovieDetailActivity"
             android:label="@string/title_activity_movie_detail"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
 
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".MovieWebView"
+            android:name="othello.com.example.bhavneetsingh.Triads.Movies.MovieWebView"
             android:label="@string/title_activity_main2"
             android:theme="@style/AppTheme.NoActionBar"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"

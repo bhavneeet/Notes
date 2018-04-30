@@ -7,7 +7,7 @@
     android:fitsSystemWindows="true"
     android:id="@+id/movie_container"
     android:background="@drawable/post_background"
-    tools:context="othello.com.example.bhavneetsingh.notes.MovieDetailActivity">
+    tools:context="othello.com.example.bhavneetsingh.Triads.Movies.MovieDetailActivity">
     <include layout="@layout/movie_detail_content"/>
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"

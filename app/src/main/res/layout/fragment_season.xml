@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="othello.com.example.bhavneetsingh.notes.SeasonFragment">
+    tools:context="othello.com.example.bhavneetsingh.notes.Movies.SeasonFragment">
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:id="@+id/seasons_list"
